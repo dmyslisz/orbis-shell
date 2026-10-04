@@ -190,11 +190,9 @@ Item {
                     anchors.centerIn: parent
                     spacing: 8
 
-                    Image {
-                        width: 18
-                        height: 18
-                        source: "qrc:/assets/icons/buttons/PS4_Cross.png"
-                        fillMode: Image.PreserveAspectFit
+                    GamepadBadge {
+                        button: "A"
+                        size: 16
                         anchors.verticalCenter: parent.verticalCenter
                     }
 

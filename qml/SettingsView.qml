@@ -72,13 +72,13 @@ Item {
 
                 Row {
                     spacing: 8
-                    Image { width: 20; height: 20; source: "qrc:/assets/icons/buttons/PS4_Cross.png"; fillMode: Image.PreserveAspectFit; anchors.verticalCenter: parent.verticalCenter }
+                    GamepadBadge { button: "A"; size: 20; anchors.verticalCenter: parent.verticalCenter }
                     Text { text: "Select"; color: "#ffffff"; font.pixelSize: 16; anchors.verticalCenter: parent.verticalCenter }
                 }
 
                 Row {
                     spacing: 8
-                    Image { width: 20; height: 20; source: "qrc:/assets/icons/buttons/PS4_Circle.png"; fillMode: Image.PreserveAspectFit; anchors.verticalCenter: parent.verticalCenter }
+                    GamepadBadge { button: "B"; size: 20; anchors.verticalCenter: parent.verticalCenter }
                     Text { text: "Back"; color: "#ffffff"; font.pixelSize: 16; anchors.verticalCenter: parent.verticalCenter }
                 }
             }

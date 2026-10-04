@@ -3,6 +3,7 @@
         <file>qml/AppLaunchSplash.qml</file>
         <file>qml/BackgroundWave.qml</file>
         <file>qml/ContextArea.qml</file>
+        <file>qml/GamepadBadge.qml</file>
         <file>qml/LibraryView.qml</file>
         <file>qml/Main.qml</file>
         <file>qml/NotificationsView.qml</file>

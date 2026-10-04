@@ -53,11 +53,9 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 8
 
-                Image {
-                    width: 22
-                    height: 22
-                    source: "qrc:/assets/icons/buttons/PS4_Circle.png"
-                    fillMode: Image.PreserveAspectFit
+                GamepadBadge {
+                    button: "B"
+                    size: 20
                     anchors.verticalCenter: parent.verticalCenter
                 }
 

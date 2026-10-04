@@ -348,16 +348,14 @@ Window {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 24
 
-                // (✕) Start / Enter
+                // (A) Start / Enter
                 Row {
                     spacing: 8
                     anchors.verticalCenter: parent.verticalCenter
 
-                    Image {
-                        width: 22
-                        height: 22
-                        source: "qrc:/assets/icons/buttons/PS4_Cross.png"
-                        fillMode: Image.PreserveAspectFit
+                    GamepadBadge {
+                        button: "A"
+                        size: 20
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
@@ -369,17 +367,15 @@ Window {
                     }
                 }
 
-                // (◯) Back (shown when in options, topbar, or deck)
+                // (B) Back (shown when in options, topbar, or deck)
                 Row {
                     spacing: 8
                     anchors.verticalCenter: parent.verticalCenter
                     visible: (stage.activeSection === "options" || stage.activeSection === "topbar" || stage.activeSection === "deck")
 
-                    Image {
-                        width: 22
-                        height: 22
-                        source: "qrc:/assets/icons/buttons/PS4_Circle.png"
-                        fillMode: Image.PreserveAspectFit
+                    GamepadBadge {
+                        button: "B"
+                        size: 20
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
@@ -397,11 +393,9 @@ Window {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: (stage.activeSection === "tiles" || stage.activeSection === "options")
 
-                    Image {
-                        width: 26
-                        height: 26
-                        source: "qrc:/assets/icons/buttons/PS4_Options.png"
-                        fillMode: Image.PreserveAspectFit
+                    GamepadBadge {
+                        button: "OPTIONS"
+                        size: 20
                         anchors.verticalCenter: parent.verticalCenter
                     }
 

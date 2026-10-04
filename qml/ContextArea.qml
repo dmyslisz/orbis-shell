@@ -92,11 +92,9 @@ Item {
                         anchors.centerIn: parent
                         spacing: 12
 
-                        Image {
-                            width: 24
-                            height: 24
-                            source: root.selectedDeckItem === 0 ? "qrc:/assets/icons/buttons/PS4_Cross.png" : "qrc:/assets/icons/buttons/PS4_Cross.png"
-                            fillMode: Image.PreserveAspectFit
+                        GamepadBadge {
+                            button: "A"
+                            size: 22
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -123,11 +121,9 @@ Item {
                         anchors.centerIn: parent
                         spacing: 10
 
-                        Image {
-                            width: 22
-                            height: 22
-                            source: "qrc:/assets/icons/buttons/PS4_Options.png"
-                            fillMode: Image.PreserveAspectFit
+                        GamepadBadge {
+                            button: "OPTIONS"
+                            size: 20
                             anchors.verticalCenter: parent.verticalCenter
                         }
 

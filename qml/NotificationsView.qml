@@ -186,23 +186,23 @@ Item {
             spacing: 36
 
             Row {
-                spacing: 8
+                spacing: 10
                 anchors.verticalCenter: parent.verticalCenter
-                Image { width: 22; height: 22; source: "qrc:/assets/icons/buttons/PS4_Cross.png"; fillMode: Image.PreserveAspectFit; anchors.verticalCenter: parent.verticalCenter }
+                GamepadBadge { button: "A"; anchors.verticalCenter: parent.verticalCenter }
                 Text { text: "View"; color: "#ffffff"; font.pixelSize: 17; anchors.verticalCenter: parent.verticalCenter }
             }
 
             Row {
-                spacing: 8
+                spacing: 10
                 anchors.verticalCenter: parent.verticalCenter
-                Image { width: 22; height: 22; source: "qrc:/assets/icons/buttons/PS4_Circle.png"; fillMode: Image.PreserveAspectFit; anchors.verticalCenter: parent.verticalCenter }
+                GamepadBadge { button: "B"; anchors.verticalCenter: parent.verticalCenter }
                 Text { text: "Back"; color: "#ffffff"; font.pixelSize: 17; anchors.verticalCenter: parent.verticalCenter }
             }
 
             Row {
-                spacing: 8
+                spacing: 10
                 anchors.verticalCenter: parent.verticalCenter
-                Image { width: 24; height: 24; source: "qrc:/assets/icons/buttons/PS4_Options.png"; fillMode: Image.PreserveAspectFit; anchors.verticalCenter: parent.verticalCenter }
+                GamepadBadge { button: "OPTIONS"; anchors.verticalCenter: parent.verticalCenter }
                 Text { text: "Options Menu"; color: "#ffffff"; font.pixelSize: 17; anchors.verticalCenter: parent.verticalCenter }
             }
         }

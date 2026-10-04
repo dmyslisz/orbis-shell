@@ -41,17 +41,17 @@ Item {
         }
     }
 
-    // Sub-header: Controller connected & Prompt (Photo 2)
+    // Centered Sub-header: Controller connected & Prompt (Photo 2)
     Column {
-        anchors.left: parent.left
-        anchors.leftMargin: 120
+        id: headerPrompt
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
-        anchors.topMargin: 190
+        anchors.topMargin: 180
         spacing: 10
 
         Row {
             spacing: 12
-            anchors.left: parent.left
+            anchors.horizontalCenter: parent.horizontalCenter
 
             Image {
                 width: 24
@@ -71,62 +71,68 @@ Item {
         }
 
         Text {
+            anchors.horizontalCenter: parent.horizontalCenter
             text: "Who is using this controller?"
             color: "#ffffff"
-            font.pixelSize: 22
+            font.pixelSize: 24
             font.weight: Font.Normal
         }
     }
 
-    // Horizontal User Profiles Row (Photo 2)
+    // Centered Horizontal User Profiles Row (Photo 2)
     Row {
         id: usersRow
-        anchors.left: parent.left
-        anchors.leftMargin: 120
+        anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
-        anchors.topMargin: 330
-        spacing: 32
+        anchors.topMargin: 310
+        spacing: 28
 
         // Card 0: "New User" Card (+)
         Item {
-            width: 170
+            width: 180
             height: 240
 
             readonly property bool isSelected: root.selectedIndex === 0 && !root.isOptionsMenuOpen
 
-            Column {
+            // Card container
+            Rectangle {
                 anchors.fill: parent
-                spacing: 16
+                radius: 2
+                color: "#0d47a1"
+                scale: isSelected ? 1.05 : 1.0
 
-                // Square Card with '+'
-                Rectangle {
-                    width: 170
-                    height: 170
-                    radius: 2
-                    color: "#0f3675"
-                    border.color: isSelected ? "#ffffff" : "#204a88"
-                    border.width: isSelected ? 3.5 : 1
-                    scale: isSelected ? 1.06 : 1.0
+                Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutQuad } }
 
-                    Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutQuad } }
-                    Behavior on border.color { ColorAnimation { duration: 100 } }
-
-                    Text {
-                        anchors.centerIn: parent
-                        text: "+"
-                        color: "#ffffff"
-                        font.pixelSize: 72
-                        font.weight: Font.Light
-                    }
-                }
-
-                // Name label below
+                // Centered white '+' icon
                 Text {
                     anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.top
+                    anchors.topMargin: 46
+                    text: "+"
+                    color: "#ffffff"
+                    font.pixelSize: 68
+                    font.weight: Font.Light
+                }
+
+                // "New User" text inside card with crisp white font
+                Text {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 24
                     text: "New User"
-                    color: isSelected ? "#ffffff" : "#a0c0e8"
+                    color: "#ffffff"
                     font.pixelSize: 18
-                    font.weight: isSelected ? Font.Medium : Font.Normal
+                    font.weight: Font.DemiBold
+                }
+
+                // White border overlay around ENTIRE card
+                Rectangle {
+                    anchors.fill: parent
+                    radius: 2
+                    color: "transparent"
+                    border.color: isSelected ? "#ffffff" : "#1a4686"
+                    border.width: isSelected ? 3.5 : 1
+                    z: 10
                 }
             }
 
@@ -147,28 +153,27 @@ Item {
                 required property int index
                 required property var modelData
                 readonly property int cardIndex: index + 1
-                width: 170
+                width: 180
                 height: 240
 
                 readonly property bool isSelected: root.selectedIndex === cardIndex && !root.isOptionsMenuOpen
 
-                Column {
+                // Card container
+                Rectangle {
                     anchors.fill: parent
-                    spacing: 16
+                    radius: 2
+                    color: "#0a2d64"
+                    scale: isSelected ? 1.05 : 1.0
 
-                    // Square Avatar Card with White Outline Selection
-                    Rectangle {
-                        width: 170
-                        height: 170
-                        radius: 2
-                        color: "#0a1d3d"
-                        border.color: isSelected ? "#ffffff" : "#1e3b68"
-                        border.width: isSelected ? 3.5 : 1
+                    Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutQuad } }
+
+                    // Avatar Image (top 180x180)
+                    Item {
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: 180
                         clip: true
-                        scale: isSelected ? 1.06 : 1.0
-
-                        Behavior on scale { NumberAnimation { duration: 150; easing.type: Easing.OutQuad } }
-                        Behavior on border.color { ColorAnimation { duration: 100 } }
 
                         Image {
                             anchors.fill: parent
@@ -177,13 +182,31 @@ Item {
                         }
                     }
 
-                    // User name label below
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: modelData.name ? modelData.name : "User " + (index + 1)
-                        color: isSelected ? "#ffffff" : "#a0c0e8"
-                        font.pixelSize: 18
-                        font.weight: isSelected ? Font.Medium : Font.Normal
+                    // User name bar (bottom 180x60)
+                    Rectangle {
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        height: 60
+                        color: "#082352"
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: modelData.name ? modelData.name : "User " + (index + 1)
+                            color: "#ffffff"
+                            font.pixelSize: 18
+                            font.weight: Font.DemiBold
+                        }
+                    }
+
+                    // White border overlay around ENTIRE card (on top of image and name bar)
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: 2
+                        color: "transparent"
+                        border.color: isSelected ? "#ffffff" : "#183a6e"
+                        border.width: isSelected ? 3.5 : 1
+                        z: 10
                     }
                 }
 
@@ -198,7 +221,7 @@ Item {
         }
     }
 
-    // Bottom Action Prompts Bar (Photo 2)
+    // Bottom Action Prompts Bar with Universal Gamepad Badges
     Row {
         anchors.left: parent.left
         anchors.leftMargin: 80
@@ -207,13 +230,10 @@ Item {
         spacing: 36
 
         Row {
-            spacing: 8
+            spacing: 10
             anchors.verticalCenter: parent.verticalCenter
-            Image {
-                width: 22
-                height: 22
-                source: "qrc:/assets/icons/buttons/PS4_Cross.png"
-                fillMode: Image.PreserveAspectFit
+            GamepadBadge {
+                button: "A"
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
@@ -225,13 +245,10 @@ Item {
         }
 
         Row {
-            spacing: 8
+            spacing: 10
             anchors.verticalCenter: parent.verticalCenter
-            Image {
-                width: 22
-                height: 22
-                source: "qrc:/assets/icons/buttons/PS4_Circle.png"
-                fillMode: Image.PreserveAspectFit
+            GamepadBadge {
+                button: "B"
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
@@ -243,14 +260,11 @@ Item {
         }
 
         Row {
-            spacing: 8
+            spacing: 10
             anchors.verticalCenter: parent.verticalCenter
             visible: root.selectedIndex > 0
-            Image {
-                width: 24
-                height: 24
-                source: "qrc:/assets/icons/buttons/PS4_Options.png"
-                fillMode: Image.PreserveAspectFit
+            GamepadBadge {
+                button: "OPTIONS"
                 anchors.verticalCenter: parent.verticalCenter
             }
             Text {
