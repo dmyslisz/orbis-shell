@@ -291,16 +291,22 @@ Item {
                         anchors.margins: 14
                         spacing: 12
 
-                        Row {
+                        Item {
                             width: parent.width
+                            height: 22
+
                             Text {
+                                anchors.left: parent.left
+                                anchors.verticalCenter: parent.verticalCenter
                                 text: "Master Volume"
                                 color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#ffffff"
                                 font.pixelSize: 16
                                 font.weight: Font.Medium
                             }
+
                             Text {
                                 anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
                                 text: systemManager.systemVolume + "%"
                                 color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#006FCD" : "#80c0ff"
                                 font.pixelSize: 16
@@ -395,24 +401,29 @@ Item {
                     border.color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#ffffff" : "#30ffffff"
                     border.width: 2
 
-                    Row {
+                    Item {
                         anchors.fill: parent
                         anchors.margins: 16
-                        spacing: 12
 
-                        Image {
-                            width: 22
-                            height: 22
-                            source: "qrc:/assets/icons/sound_mute.svg"
+                        Row {
+                            anchors.left: parent.left
                             anchors.verticalCenter: parent.verticalCenter
-                        }
+                            spacing: 12
 
-                        Text {
-                            text: systemManager.isMuted ? "Unmute Audio" : "Mute Audio"
-                            color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#0a1d3d" : "#ffffff"
-                            font.pixelSize: 17
-                            font.weight: Font.Medium
-                            anchors.verticalCenter: parent.verticalCenter
+                            Image {
+                                width: 22
+                                height: 22
+                                source: "qrc:/assets/icons/sound_mute.svg"
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                text: systemManager.isMuted ? "Unmute Audio" : "Mute Audio"
+                                color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#0a1d3d" : "#ffffff"
+                                font.pixelSize: 17
+                                font.weight: Font.Medium
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
                         }
 
                         Rectangle {

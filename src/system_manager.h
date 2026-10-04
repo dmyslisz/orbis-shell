@@ -25,10 +25,10 @@ public:
     bool hasBattery() const { return m_hasBattery; }
 
     int systemVolume() const { return m_systemVolume; }
-    void setSystemVolume(int vol);
+    Q_INVOKABLE void setSystemVolume(int vol);
 
     bool isMuted() const { return m_isMuted; }
-    void setIsMuted(bool muted);
+    Q_INVOKABLE void setIsMuted(bool muted);
 
     bool isOnline() const { return m_isOnline; }
     QString networkType() const { return m_networkType; }

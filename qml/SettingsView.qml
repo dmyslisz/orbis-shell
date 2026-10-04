@@ -216,7 +216,7 @@ Item {
                         border.color: "#20ffffff"
                         border.width: 1
 
-                        Row {
+                        Item {
                             anchors.fill: parent
                             anchors.margins: 20
                             Text {
@@ -224,6 +224,7 @@ Item {
                                 color: "#80a8d8"
                                 font.pixelSize: 18
                                 font.weight: Font.Medium
+                                anchors.left: parent.left
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                             Text {
@@ -254,12 +255,12 @@ Item {
                     border.color: root.subSelectedIndex === 0 ? "#ffffff" : "#20ffffff"
                     border.width: root.subSelectedIndex === 0 ? 2 : 1
 
-                    Row {
+                    Item {
                         anchors.fill: parent
                         anchors.margins: 20
-                        spacing: 24
 
                         Column {
+                            anchors.left: parent.left
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: 4
                             Text {
@@ -338,11 +339,12 @@ Item {
                     border.color: root.subSelectedIndex === 1 ? "#ffffff" : "#20ffffff"
                     border.width: root.subSelectedIndex === 1 ? 2 : 1
 
-                    Row {
+                    Item {
                         anchors.fill: parent
                         anchors.margins: 20
 
                         Column {
+                            anchors.left: parent.left
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: 4
                             Text {
@@ -395,11 +397,12 @@ Item {
                     border.color: root.subSelectedIndex === 2 ? "#ffffff" : "#20ffffff"
                     border.width: root.subSelectedIndex === 2 ? 2 : 1
 
-                    Row {
+                    Item {
                         anchors.fill: parent
                         anchors.margins: 20
 
                         Column {
+                            anchors.left: parent.left
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: 4
                             Text {
@@ -535,7 +538,7 @@ Item {
                         border.color: "#20ffffff"
                         border.width: 1
 
-                        Row {
+                        Item {
                             anchors.fill: parent
                             anchors.margins: 20
                             Text {
@@ -543,6 +546,7 @@ Item {
                                 color: "#80a8d8"
                                 font.pixelSize: 18
                                 font.weight: Font.Medium
+                                anchors.left: parent.left
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                             Text {

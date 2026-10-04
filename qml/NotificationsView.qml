@@ -108,35 +108,40 @@ Item {
 
                     Behavior on color { ColorAnimation { duration: 120 } }
 
-                    Row {
+                    Item {
                         anchors.fill: parent
                         anchors.margins: 18
-                        spacing: 20
 
-                        Image {
-                            width: 32
-                            height: 32
-                            source: modelData.icon
-                            fillMode: Image.PreserveAspectFit
+                        Row {
+                            anchors.left: parent.left
                             anchors.verticalCenter: parent.verticalCenter
-                            opacity: isSelected ? 0.95 : 0.75
-                        }
+                            spacing: 20
 
-                        Column {
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 4
-
-                            Text {
-                                text: modelData.title
-                                color: isSelected ? "#0a1d3d" : "#ffffff"
-                                font.pixelSize: 18
-                                font.weight: isSelected ? Font.DemiBold : Font.Normal
+                            Image {
+                                width: 32
+                                height: 32
+                                source: modelData.icon
+                                fillMode: Image.PreserveAspectFit
+                                anchors.verticalCenter: parent.verticalCenter
+                                opacity: isSelected ? 0.95 : 0.75
                             }
 
-                            Text {
-                                text: modelData.desc
-                                color: isSelected ? "#2a4d7d" : "#80a8d8"
-                                font.pixelSize: 14
+                            Column {
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 4
+
+                                Text {
+                                    text: modelData.title
+                                    color: isSelected ? "#0a1d3d" : "#ffffff"
+                                    font.pixelSize: 18
+                                    font.weight: isSelected ? Font.DemiBold : Font.Normal
+                                }
+
+                                Text {
+                                    text: modelData.desc
+                                    color: isSelected ? "#2a4d7d" : "#80a8d8"
+                                    font.pixelSize: 14
+                                }
                             }
                         }
 
