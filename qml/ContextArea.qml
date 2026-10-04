@@ -81,7 +81,7 @@ Item {
                     width: 220
                     height: 64
                     radius: 6
-                    color: root.selectedDeckItem === 0 ? "#ffffff" : "#c0001844"
+                    color: root.selectedDeckItem === 0 ? "#16325c" : "#c0001844"
                     border.color: "#ffffff"
                     border.width: root.selectedDeckItem === 0 ? 3 : 1.5
 
@@ -100,7 +100,7 @@ Item {
 
                         Text {
                             text: (processLauncher.isAppRunning && processLauncher.currentAppName === (root.currentAppData ? root.currentAppData.name : "")) ? "Resume" : "Start"
-                            color: root.selectedDeckItem === 0 ? "#001844" : "#ffffff"
+                            color: "#ffffff"
                             font.pixelSize: 22
                             font.weight: Font.Bold
                             anchors.verticalCenter: parent.verticalCenter

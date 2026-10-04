@@ -109,7 +109,9 @@ Item {
             }
         }
 
-        // Bottom drawer section with down arrow (visible only when focused)
+        // Bottom drawer section (visible only when focused)
+        // Only on "What's New": down arrow
+        // On all other tiles: "Start" written
         Rectangle {
             id: bottomDrawer
             anchors.bottom: parent.bottom
@@ -124,9 +126,11 @@ Item {
                 NumberAnimation { duration: 150 }
             }
 
+            // What's New: Down Arrow
             Row {
                 anchors.centerIn: parent
                 spacing: 8
+                visible: root.appData && root.appData.id === "whats_new"
 
                 Image {
                     width: 18
@@ -138,9 +142,19 @@ Item {
                 Text {
                     text: "Overview"
                     color: "#b0d0ff"
-                    font.pixelSize: 13
+                    font.pixelSize: 14
                     anchors.verticalCenter: parent.verticalCenter
                 }
+            }
+
+            // All other tiles: "Start" written
+            Text {
+                anchors.centerIn: parent
+                visible: !root.appData || root.appData.id !== "whats_new"
+                text: (processLauncher.isAppRunning && processLauncher.currentAppName === (root.appData ? root.appData.name : "")) ? "Resume" : "Start"
+                color: "#ffffff"
+                font.pixelSize: 18
+                font.weight: Font.DemiBold
             }
         }
 
@@ -155,7 +169,7 @@ Item {
         }
     }
 
-    // Title & Start pill button displayed directly to the right of the focused tile (PS4 style)
+    // Game / App Title displayed directly to the right of the focused tile (PS4 style)
     Item {
         anchors.left: tileBox.right
         anchors.leftMargin: 24
@@ -170,52 +184,15 @@ Item {
             NumberAnimation { duration: 160; easing.type: Easing.OutQuad }
         }
 
-        Row {
+        Text {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 16
-
-            // "Start" translucent pill button
-            Rectangle {
-                width: startContentRow.implicitWidth + 28
-                height: 42
-                radius: 4
-                color: "#c0001030"
-                border.color: "#50ffffff"
-                border.width: 1
-                anchors.verticalCenter: parent.verticalCenter
-
-                Row {
-                    id: startContentRow
-                    anchors.centerIn: parent
-                    spacing: 8
-
-                    GamepadBadge {
-                        button: "A"
-                        size: 16
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-
-                    Text {
-                        text: (processLauncher.isAppRunning && processLauncher.currentAppName === (root.appData ? root.appData.name : "")) ? "Resume" : "Start"
-                        color: "#ffffff"
-                        font.pixelSize: 17
-                        font.weight: Font.DemiBold
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-            }
-
-            // Game / App Title
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: (root.appData && root.appData.name) ? root.appData.name : ""
-                color: "#ffffff"
-                font.pixelSize: 34
-                font.weight: Font.Normal
-                elide: Text.ElideRight
-                width: 420
-            }
+            text: (root.appData && root.appData.name) ? root.appData.name : ""
+            color: "#ffffff"
+            font.pixelSize: 34
+            font.weight: Font.Normal
+            elide: Text.ElideRight
+            width: 580
         }
     }
 }
