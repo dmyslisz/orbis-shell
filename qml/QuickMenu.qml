@@ -5,6 +5,7 @@ Item {
     id: root
     width: parent.width
     height: 1080
+    visible: root.isOpen || panel.x > -panel.width
 
     property bool isOpen: false
     property string userName: "Player 1"
@@ -35,6 +36,7 @@ Item {
 
         MouseArea {
             anchors.fill: parent
+            enabled: root.isOpen
             onClicked: root.closeRequested()
         }
     }
@@ -44,7 +46,6 @@ Item {
         id: panel
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.left: parent.left
         width: 720
         color: "#f008162e"
         border.color: "#25ffffff"

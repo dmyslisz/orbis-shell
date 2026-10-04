@@ -169,6 +169,7 @@ Window {
         // ==========================================
         OptionsPanel {
             id: optionsPanel
+            z: 50
             isOpen: stage.activeSection === "options"
             currentAppData: tileRow.currentItem()
 
@@ -197,6 +198,7 @@ Window {
         // ==========================================
         QuickMenu {
             id: quickMenu
+            z: 50
             isOpen: stage.activeSection === "quickmenu"
             userName: stage.currentUserName
             userAvatar: stage.currentUserAvatar
@@ -222,6 +224,7 @@ Window {
         // ==========================================
         SettingsView {
             id: settingsView
+            z: 100
             isOpen: stage.activeSection === "settings"
             onCloseRequested: {
                 stage.activeSection = "topbar";
@@ -231,6 +234,7 @@ Window {
 
         LibraryView {
             id: libraryView
+            z: 100
             isOpen: stage.activeSection === "library"
             onCloseRequested: {
                 stage.activeSection = "tiles";
@@ -245,6 +249,7 @@ Window {
 
         TrophiesView {
             id: trophiesView
+            z: 100
             isOpen: stage.activeSection === "trophies"
             onCloseRequested: {
                 stage.activeSection = "topbar";
@@ -254,6 +259,7 @@ Window {
 
         NotificationsView {
             id: notifView
+            z: 100
             isOpen: stage.activeSection === "notifications"
             onCloseRequested: {
                 stage.activeSection = "topbar";
@@ -263,6 +269,7 @@ Window {
 
         PowerMenu {
             id: powerMenu
+            z: 100
             isOpen: stage.activeSection === "power"
             onCloseRequested: {
                 stage.activeSection = (stage.activeSection === "quickmenu" ? "tiles" : "topbar");
