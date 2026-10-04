@@ -83,26 +83,6 @@ void ConfigManager::onSteamGamesScanned()
 void ConfigManager::mergeScannedItems()
 {
     m_apps = m_baseApps;
-
-    // Insert Steam games before the Library tile
-    if (m_steamScanner) {
-        QVariantList steamGames = m_steamScanner->steamGames();
-        int insertPos = qMax(0, m_apps.size() - 1); // Before Library tile
-        for (const QVariant &g : steamGames) {
-            QVariantMap gm = g.toMap();
-            gm["gradientStart"] = "#1b2838";
-            gm["gradientEnd"] = "#0d1217";
-            QVariantMap ctx;
-            ctx["headline"] = gm["name"].toString();
-            ctx["description"] = "Installed Steam Game. Ready to launch with full controller support.";
-            ctx["playtime"] = "Steam Game";
-            ctx["patchNotes"] = "Steam Play (Proton / Native)";
-            ctx["badge"] = "STEAM";
-            gm["context"] = ctx;
-            m_apps.insert(insertPos++, gm);
-        }
-    }
-
     emit appsChanged();
 }
 

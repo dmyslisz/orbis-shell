@@ -9,6 +9,7 @@
         <file>qml/NotificationsView.qml</file>
         <file>qml/OptionsPanel.qml</file>
         <file>qml/PowerMenu.qml</file>
+        <file>qml/PowerTransitionOverlay.qml</file>
         <file>qml/QuickMenu.qml</file>
         <file>qml/SettingsView.qml</file>
         <file>qml/TileItem.qml</file>

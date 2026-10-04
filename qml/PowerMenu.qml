@@ -10,6 +10,7 @@ Item {
 
     signal closeRequested()
     signal switchUserRequested()
+    signal powerActionRequested(string actionId)
 
     readonly property var powerOptions: [
         { id: "rest", name: "Enter Rest Mode", desc: "Suspend power to system. Wake up instantly with controller.", icon: "qrc:/assets/icons/rest_mode.svg" },
@@ -146,19 +147,13 @@ Item {
     function triggerCurrent() {
         var opt = powerOptions[selectedIndex];
         soundController.playConfirm();
-        if (opt.id === "rest") {
-            systemManager.enterRestMode();
-        } else if (opt.id === "poweroff") {
-            systemManager.turnOff();
-        } else if (opt.id === "reboot") {
-            systemManager.restart();
-        } else if (opt.id === "switch_user") {
+        if (opt.id === "switch_user") {
             switchUserRequested();
         } else if (opt.id === "logout") {
             soundController.playLogout();
             switchUserRequested();
-        } else if (opt.id === "close_shell") {
-            Qt.quit();
+        } else {
+            powerActionRequested(opt.id);
         }
     }
 }

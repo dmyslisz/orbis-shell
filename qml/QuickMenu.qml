@@ -18,6 +18,7 @@ Item {
     signal actionTriggered(string actionId)
     signal closeRequested()
     signal switchUserRequested()
+    signal powerActionRequested(string actionId)
 
     readonly property var menuItems: [
         { id: "close_app", name: "Close Application", icon: "qrc:/assets/icons/close_app.svg" },
@@ -672,19 +673,13 @@ Item {
             }
         } else if (selectedIndex === 2) {
             var pOpt = powerOptions[rightSelectedIndex];
-            if (pOpt.id === "rest") {
-                systemManager.enterRestMode();
-            } else if (pOpt.id === "poweroff") {
-                systemManager.turnOff();
-            } else if (pOpt.id === "reboot") {
-                systemManager.restart();
-            } else if (pOpt.id === "switch_user") {
+            if (pOpt.id === "switch_user") {
                 root.switchUserRequested();
             } else if (pOpt.id === "logout") {
                 soundController.playLogout();
                 root.switchUserRequested();
-            } else if (pOpt.id === "close_shell") {
-                Qt.quit();
+            } else {
+                root.powerActionRequested(pOpt.id);
             }
         }
     }

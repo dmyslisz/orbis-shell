@@ -14,6 +14,10 @@ Item {
     property bool isOptionsMenuOpen: false
     property int optionsSelectedIndex: 0
 
+    property bool isAppPickerOpen: false
+    property int appPickerIndex: 0
+    property var keyboardItem: null
+
     signal appSelected(var appData)
     signal closeRequested()
     signal notificationRequested(string message, string icon)
@@ -26,28 +30,13 @@ Item {
         { id: "system", name: "System" }
     ]
 
-    // Filtered list of applications
+    // Filtered list of applications (sourced only from configManager.apps, excluding library and whats_new)
     readonly property var filteredApps: {
         var baseList = [];
-        // Combine config apps and dynamically scanned apps
         for (var i = 0; i < configManager.apps.length; ++i) {
             var item = configManager.apps[i];
-            if (item.id !== "library") { // don't show library itself inside library
+            if (item.id !== "library" && item.id !== "whats_new") {
                 baseList.push(item);
-            }
-        }
-        for (var j = 0; j < appScanner.installedApps.length; ++j) {
-            var scanned = appScanner.installedApps[j];
-            // Ensure no duplicate if already present in baseList
-            var exists = false;
-            for (var k = 0; k < baseList.length; ++k) {
-                if (baseList[k].id === scanned.id || baseList[k].name === scanned.name) {
-                    exists = true;
-                    break;
-                }
-            }
-            if (!exists) {
-                baseList.push(scanned);
             }
         }
 
@@ -76,17 +65,36 @@ Item {
         });
     }
 
+    readonly property var availableSystemApps: {
+        var list = [];
+        for (var i = 0; i < appScanner.installedApps.length; ++i) {
+            list.push(appScanner.installedApps[i]);
+        }
+        list.sort(function(a, b) {
+            return (a.name || "").localeCompare(b.name || "");
+        });
+        return list;
+    }
+
     readonly property var currentApp: (isGridFocused && selectedGridIndex >= 0 && selectedGridIndex < filteredApps.length) ? filteredApps[selectedGridIndex] : null
     readonly property bool isCurrentAppOnHome: currentApp ? configManager.isAppOnHomeScreen(currentApp.id ? currentApp.id : currentApp.name) : false
 
     readonly property var currentAppOptions: {
-        if (!currentApp) return [];
         var opts = [];
+        if (!isGridFocused) {
+            opts.push({ id: "add_system_app", name: "Add App from System", icon: "qrc:/assets/icons/launcher_logo.svg" });
+            return opts;
+        }
+        if (!currentApp) {
+            opts.push({ id: "add_system_app", name: "Add App from System", icon: "qrc:/assets/icons/launcher_logo.svg" });
+            return opts;
+        }
         if (isCurrentAppOnHome) {
             opts.push({ id: "remove_home", name: "Remove from Home Screen", icon: "qrc:/assets/icons/close_app.svg" });
         } else {
             opts.push({ id: "add_home", name: "Add to Home Screen", icon: "qrc:/assets/icons/launcher_logo.svg" });
         }
+        opts.push({ id: "add_system_app", name: "Add App from System", icon: "qrc:/assets/icons/launcher_logo.svg" });
         opts.push({ id: "start", name: "Start Application", icon: "qrc:/assets/icons/gamepad.svg" });
         return opts;
     }
@@ -130,18 +138,20 @@ Item {
 
             // Search Bar
             Rectangle {
+                id: searchBarContainer
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: 440
+                width: 480
                 height: 44
                 radius: 6
-                color: "#102342"
-                border.color: "#305580"
-                border.width: 1
+                color: (searchInput.activeFocus || root.searchQuery.length > 0) ? "#163156" : "#102342"
+                border.color: (searchInput.activeFocus) ? "#ffffff" : "#4070a8"
+                border.width: (searchInput.activeFocus) ? 2 : 1
 
                 Row {
                     anchors.fill: parent
-                    anchors.margins: 10
+                    anchors.leftMargin: 12
+                    anchors.rightMargin: 12
                     spacing: 10
 
                     Image {
@@ -154,13 +164,33 @@ Item {
                     TextField {
                         id: searchInput
                         anchors.verticalCenter: parent.verticalCenter
-                        width: parent.width - 40
+                        width: parent.width - 70
                         placeholderText: "Search games and applications..."
+                        placeholderTextColor: "#a8c8ec"
                         color: "#ffffff"
                         font.pixelSize: 16
+                        font.weight: Font.Medium
                         background: null
+                        selectByMouse: true
                         onTextChanged: root.searchQuery = text
+                        Keys.onReturnPressed: {
+                            if (root.filteredApps.length > 0) {
+                                root.isGridFocused = true;
+                                root.selectedGridIndex = 0;
+                            }
+                        }
                     }
+
+                    GamepadBadge {
+                        button: "Y"
+                        size: 18
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: root.activateSearch()
                 }
             }
 
@@ -179,7 +209,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
                     Text {
-                        text: root.isOptionsMenuOpen ? "Select" : (root.isGridFocused ? "Start" : "Select")
+                        text: root.isAppPickerOpen ? "Add App" : (root.isOptionsMenuOpen ? "Select" : (root.isGridFocused ? "Start" : "Select"))
                         color: "#ffffff"
                         font.pixelSize: 16
                         anchors.verticalCenter: parent.verticalCenter
@@ -189,7 +219,7 @@ Item {
                 Row {
                     spacing: 8
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: root.isGridFocused && !root.isOptionsMenuOpen
+                    visible: !root.isOptionsMenuOpen && !root.isAppPickerOpen
                     GamepadBadge {
                         button: "OPTIONS"
                         size: 18
@@ -197,6 +227,23 @@ Item {
                     }
                     Text {
                         text: "Options"
+                        color: "#ffffff"
+                        font.pixelSize: 16
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                Row {
+                    spacing: 8
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: !root.isOptionsMenuOpen && !root.isAppPickerOpen
+                    GamepadBadge {
+                        button: "Y"
+                        size: 18
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Text {
+                        text: "Search"
                         color: "#ffffff"
                         font.pixelSize: 16
                         anchors.verticalCenter: parent.verticalCenter
@@ -229,7 +276,7 @@ Item {
             color: "#20ffffff"
         }
 
-        // Main Area: Left Category Selector + Right Apps Grid
+        // Main Area: Left Category Navigation + Right Apps Grid
         Item {
             anchors.top: header.bottom
             anchors.topMargin: 20
@@ -254,7 +301,7 @@ Item {
                     width: catList.width
                     height: 52
 
-                    readonly property bool isSelected: !root.isGridFocused && !root.isOptionsMenuOpen && root.selectedCategoryIndex === index
+                    readonly property bool isSelected: !root.isGridFocused && !root.isOptionsMenuOpen && !root.isAppPickerOpen && root.selectedCategoryIndex === index
                     readonly property bool isCurrentCat: root.selectedCategoryIndex === index
 
                     Rectangle {
@@ -308,6 +355,12 @@ Item {
                 cellWidth: 260
                 cellHeight: 220
                 model: root.filteredApps
+                currentIndex: root.selectedGridIndex
+                visible: root.filteredApps.length > 0
+
+                onCurrentIndexChanged: {
+                    positionViewAtIndex(currentIndex, GridView.Contain)
+                }
 
                 delegate: Item {
                     required property int index
@@ -315,7 +368,7 @@ Item {
                     width: appsGrid.cellWidth
                     height: appsGrid.cellHeight
 
-                    readonly property bool isSelected: root.isGridFocused && !root.isOptionsMenuOpen && root.selectedGridIndex === index
+                    readonly property bool isSelected: root.isGridFocused && !root.isOptionsMenuOpen && !root.isAppPickerOpen && root.selectedGridIndex === index
 
                     Column {
                         anchors.centerIn: parent
@@ -369,6 +422,43 @@ Item {
                     }
                 }
             }
+
+            // Empty state placeholder
+            Item {
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.left: catList.right
+                anchors.leftMargin: 50
+                anchors.right: parent.right
+                visible: root.filteredApps.length === 0
+
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 16
+
+                    Image {
+                        width: 48
+                        height: 48
+                        source: "qrc:/assets/icons/library.svg"
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        opacity: 0.5
+                    }
+
+                    Text {
+                        text: root.searchQuery.length > 0 ? "No results found for \"" + root.searchQuery + "\"" : "No applications in this category"
+                        color: "#90b4dc"
+                        font.pixelSize: 20
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+
+                    Text {
+                        text: "Press (OPTIONS) to add an application from your system."
+                        color: "#6080a8"
+                        font.pixelSize: 15
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+            }
         }
 
         // ==========================================
@@ -397,7 +487,7 @@ Item {
                 anchors.topMargin: 40
                 spacing: 20
 
-                // Focused App Header
+                // Header
                 Row {
                     spacing: 14
                     anchors.left: parent.left
@@ -413,13 +503,13 @@ Item {
 
                         Image {
                             anchors.fill: parent
-                            source: root.currentApp ? (root.currentApp.icon || "qrc:/assets/icons/gamepad.svg") : "qrc:/assets/icons/gamepad.svg"
+                            source: (root.isGridFocused && root.currentApp) ? (root.currentApp.icon || "qrc:/assets/icons/gamepad.svg") : "qrc:/assets/icons/launcher_logo.svg"
                             fillMode: Image.PreserveAspectCrop
                         }
                     }
 
                     Text {
-                        text: root.currentApp ? root.currentApp.name : "Options"
+                        text: (root.isGridFocused && root.currentApp) ? root.currentApp.name : "Category Options"
                         color: "#ffffff"
                         font.pixelSize: 20
                         font.weight: Font.DemiBold
@@ -488,10 +578,200 @@ Item {
                 }
             }
         }
+
+        // ==========================================
+        // SYSTEM APP PICKER MODAL OVERLAY
+        // ==========================================
+        Rectangle {
+            id: appPickerOverlay
+            anchors.fill: parent
+            color: "#f0040b18"
+            visible: root.isAppPickerOpen
+            z: 300
+
+            MouseArea {
+                anchors.fill: parent
+                // absorb clicks
+            }
+
+            Column {
+                anchors.fill: parent
+                anchors.margins: 60
+                spacing: 24
+
+                // Header
+                Row {
+                    width: parent.width
+                    height: 50
+                    spacing: 16
+
+                    Image {
+                        width: 36
+                        height: 36
+                        source: "qrc:/assets/icons/launcher_logo.svg"
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Column {
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 2
+
+                        Text {
+                            text: "Add Application from System"
+                            color: "#ffffff"
+                            font.pixelSize: 28
+                            font.weight: Font.DemiBold
+                        }
+
+                        Text {
+                            text: "Select an installed application to add to your Home Screen and Library."
+                            color: "#90b4dc"
+                            font.pixelSize: 15
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: parent.width
+                    height: 1
+                    color: "#20ffffff"
+                }
+
+                // Grid of installed system applications
+                GridView {
+                    id: systemAppsGrid
+                    width: parent.width
+                    height: parent.height - 140
+                    clip: true
+                    cellWidth: width / 3
+                    cellHeight: 84
+                    model: root.availableSystemApps
+                    currentIndex: root.appPickerIndex
+
+                    onCurrentIndexChanged: {
+                        positionViewAtIndex(currentIndex, GridView.Contain)
+                    }
+
+                    delegate: Item {
+                        required property int index
+                        required property var modelData
+                        width: systemAppsGrid.cellWidth
+                        height: systemAppsGrid.cellHeight
+
+                        readonly property bool isSelected: root.isAppPickerOpen && root.appPickerIndex === index
+                        readonly property bool isAlreadyAdded: configManager.isAppOnHomeScreen(modelData.id ? modelData.id : modelData.name)
+
+                        Rectangle {
+                            anchors.fill: parent
+                            anchors.margins: 6
+                            radius: 6
+                            color: isSelected ? "#16325c" : "#0d1b33"
+                            border.color: isSelected ? "#ffffff" : "#204068"
+                            border.width: isSelected ? 2.5 : 1
+
+                            Row {
+                                anchors.fill: parent
+                                anchors.margins: 12
+                                spacing: 14
+
+                                Rectangle {
+                                    width: 44
+                                    height: 44
+                                    radius: 6
+                                    color: "#122340"
+                                    clip: true
+                                    anchors.verticalCenter: parent.verticalCenter
+
+                                    Image {
+                                        anchors.fill: parent
+                                        source: modelData.icon ? modelData.icon : "qrc:/assets/icons/gamepad.svg"
+                                        fillMode: Image.PreserveAspectFit
+                                    }
+                                }
+
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: parent.width - 70 - (isAlreadyAdded ? 70 : 0)
+                                    spacing: 3
+
+                                    Text {
+                                        text: modelData.name
+                                        color: "#ffffff"
+                                        font.pixelSize: 16
+                                        font.weight: isSelected ? Font.DemiBold : Font.Normal
+                                        elide: Text.ElideRight
+                                        width: parent.width
+                                    }
+
+                                    Text {
+                                        text: modelData.category ? modelData.category : "Application"
+                                        color: "#7fa4cf"
+                                        font.pixelSize: 13
+                                        elide: Text.ElideRight
+                                        width: parent.width
+                                    }
+                                }
+
+                                Rectangle {
+                                    visible: isAlreadyAdded
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    width: 58
+                                    height: 24
+                                    radius: 12
+                                    color: "#1b4c80"
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "Added"
+                                        color: "#ffffff"
+                                        font.pixelSize: 11
+                                        font.weight: Font.DemiBold
+                                    }
+                                }
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                root.appPickerIndex = index;
+                                root.pickCurrentApp();
+                            }
+                        }
+                    }
+                }
+
+                // Footer hints
+                Row {
+                    anchors.right: parent.right
+                    spacing: 24
+
+                    Row {
+                        spacing: 8
+                        GamepadBadge { button: "A"; size: 18; anchors.verticalCenter: parent.verticalCenter }
+                        Text { text: "Add to Home Screen"; color: "#ffffff"; font.pixelSize: 16; anchors.verticalCenter: parent.verticalCenter }
+                    }
+
+                    Row {
+                        spacing: 8
+                        GamepadBadge { button: "B"; size: 18; anchors.verticalCenter: parent.verticalCenter }
+                        Text { text: "Back"; color: "#ffffff"; font.pixelSize: 16; anchors.verticalCenter: parent.verticalCenter }
+                    }
+                }
+            }
+        }
     }
 
     // Console Navigation
     function selectPrevious() {
+        if (root.isAppPickerOpen) {
+            if (appPickerIndex > 0) {
+                appPickerIndex--;
+                soundController.playTick();
+                return true;
+            }
+            return true;
+        }
         if (root.isOptionsMenuOpen) return true;
         if (!isGridFocused) {
             if (selectedCategoryIndex > 0) {
@@ -512,10 +792,20 @@ Item {
     }
 
     function selectNext() {
+        if (root.isAppPickerOpen) {
+            if (appPickerIndex < availableSystemApps.length - 1) {
+                appPickerIndex++;
+                soundController.playTick();
+                return true;
+            }
+            return true;
+        }
         if (root.isOptionsMenuOpen) return true;
         if (!isGridFocused) {
-            isGridFocused = true;
-            return true;
+            if (filteredApps.length > 0) {
+                isGridFocused = true;
+                return true;
+            }
         } else {
             if (selectedGridIndex < filteredApps.length - 1) {
                 selectedGridIndex++;
@@ -526,6 +816,14 @@ Item {
     }
 
     function selectUp() {
+        if (root.isAppPickerOpen) {
+            if (appPickerIndex >= 3) {
+                appPickerIndex -= 3;
+                soundController.playTick();
+                return true;
+            }
+            return true;
+        }
         if (root.isOptionsMenuOpen) {
             if (optionsSelectedIndex > 0) {
                 optionsSelectedIndex--;
@@ -549,6 +847,14 @@ Item {
     }
 
     function selectDown() {
+        if (root.isAppPickerOpen) {
+            if (appPickerIndex + 3 < availableSystemApps.length) {
+                appPickerIndex += 3;
+                soundController.playTick();
+                return true;
+            }
+            return true;
+        }
         if (root.isOptionsMenuOpen) {
             if (optionsSelectedIndex < currentAppOptions.length - 1) {
                 optionsSelectedIndex++;
@@ -572,6 +878,10 @@ Item {
     }
 
     function triggerCurrent() {
+        if (root.isAppPickerOpen) {
+            pickCurrentApp();
+            return;
+        }
         if (root.isOptionsMenuOpen) {
             triggerOptionsAction();
             return;
@@ -580,44 +890,80 @@ Item {
             var app = filteredApps[selectedGridIndex];
             appSelected(app);
         } else if (!isGridFocused) {
-            isGridFocused = true;
+            if (filteredApps.length > 0) {
+                isGridFocused = true;
+            }
+        }
+    }
+
+    function pickCurrentApp() {
+        if (appPickerIndex >= 0 && appPickerIndex < availableSystemApps.length) {
+            var app = availableSystemApps[appPickerIndex];
+            configManager.addAppToHomeScreen(app);
+            soundController.playConfirm();
+            root.isAppPickerOpen = false;
+            root.notificationRequested("Successfully added " + app.name + " to Home Screen", app.icon || "qrc:/assets/icons/launcher_logo.svg");
         }
     }
 
     function openOptions() {
-        if (isGridFocused && currentApp) {
-            optionsSelectedIndex = 0;
-            isOptionsMenuOpen = true;
-            soundController.playOptions();
-            return true;
-        }
-        return false;
+        if (root.isAppPickerOpen) return false;
+        optionsSelectedIndex = 0;
+        isOptionsMenuOpen = true;
+        soundController.playOptions();
+        return true;
     }
 
     function triggerOptionsAction() {
-        if (!currentApp || optionsSelectedIndex < 0 || optionsSelectedIndex >= currentAppOptions.length) return;
+        if (optionsSelectedIndex < 0 || optionsSelectedIndex >= currentAppOptions.length) return;
         var opt = currentAppOptions[optionsSelectedIndex];
         soundController.playConfirm();
-        if (opt.id === "add_home") {
-            configManager.addAppToHomeScreen(currentApp);
+        if (opt.id === "add_system_app") {
             root.isOptionsMenuOpen = false;
-            root.notificationRequested("Successfully added " + currentApp.name + " to Home Screen", currentApp.icon || "qrc:/assets/icons/launcher_logo.svg");
+            root.isAppPickerOpen = true;
+            root.appPickerIndex = 0;
+        } else if (opt.id === "add_home") {
+            if (currentApp) {
+                configManager.addAppToHomeScreen(currentApp);
+                root.isOptionsMenuOpen = false;
+                root.notificationRequested("Successfully added " + currentApp.name + " to Home Screen", currentApp.icon || "qrc:/assets/icons/launcher_logo.svg");
+            }
         } else if (opt.id === "remove_home") {
-            configManager.removeAppFromHomeScreen(currentApp.id ? currentApp.id : currentApp.name);
-            root.isOptionsMenuOpen = false;
-            root.notificationRequested("Removed " + currentApp.name + " from Home Screen", currentApp.icon || "qrc:/assets/icons/close_app.svg");
+            if (currentApp) {
+                configManager.removeAppFromHomeScreen(currentApp.id ? currentApp.id : currentApp.name);
+                root.isOptionsMenuOpen = false;
+                root.notificationRequested("Removed " + currentApp.name + " from Home Screen", currentApp.icon || "qrc:/assets/icons/close_app.svg");
+            }
         } else if (opt.id === "start") {
-            root.isOptionsMenuOpen = false;
-            root.appSelected(currentApp);
+            if (currentApp) {
+                root.isOptionsMenuOpen = false;
+                root.appSelected(currentApp);
+            }
         }
     }
 
     function handleBack() {
+        if (root.isAppPickerOpen) {
+            root.isAppPickerOpen = false;
+            soundController.playBack();
+            return true;
+        }
         if (root.isOptionsMenuOpen) {
             root.isOptionsMenuOpen = false;
             soundController.playBack();
             return true;
         }
         return false;
+    }
+
+    function activateSearch() {
+        soundController.playConfirm();
+        searchInput.forceActiveFocus();
+        if (keyboardItem) {
+            keyboardItem.open("Search Library", root.searchQuery, function(res) {
+                searchInput.text = res;
+                root.searchQuery = res;
+            });
+        }
     }
 }

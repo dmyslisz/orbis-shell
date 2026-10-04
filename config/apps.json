@@ -16,54 +16,6 @@
     }
   },
   {
-    "id": "steam",
-    "name": "Steam",
-    "icon": "qrc:/assets/covers/steam.svg",
-    "exec": "steam",
-    "isSystem": false,
-    "gradientStart": "#1b2838",
-    "gradientEnd": "#0d1217",
-    "context": {
-      "headline": "The Ultimate Entertainment Platform",
-      "description": "Play thousands of native Linux and Proton games directly with complete gamepad support and cloud save synchronization.",
-      "playtime": "240 Hours Played",
-      "patchNotes": "Steam Client Native Linux Runtime",
-      "badge": "DIGITAL"
-    }
-  },
-  {
-    "id": "browser",
-    "name": "Internet Browser",
-    "icon": "qrc:/assets/covers/browser.svg",
-    "exec": "firefox",
-    "isSystem": false,
-    "gradientStart": "#0052D4",
-    "gradientEnd": "#102a6b",
-    "context": {
-      "headline": "World Wide Web",
-      "description": "Browse the web, stream videos, and visit your favorite websites with hardware acceleration on Wayland.",
-      "playtime": "58 Hours",
-      "patchNotes": "Mozilla Firefox / Wayland Native",
-      "badge": "APP"
-    }
-  },
-  {
-    "id": "retroarch",
-    "name": "RetroArch",
-    "icon": "qrc:/assets/covers/retroarch.svg",
-    "exec": "retroarch",
-    "isSystem": false,
-    "gradientStart": "#2b2d42",
-    "gradientEnd": "#14151f",
-    "context": {
-      "headline": "Cross-Platform Game Frontend",
-      "description": "Unified console emulation frontend with shaders, netplay, rewind, and zero input latency.",
-      "playtime": "84 Hours Played",
-      "patchNotes": "RetroArch Multi-Core Engine",
-      "badge": "EMULATOR"
-    }
-  },
-  {
     "id": "gallery",
     "name": "Capture Gallery",
     "icon": "qrc:/assets/covers/gallery.svg",
@@ -93,22 +45,6 @@
       "playtime": "Ready",
       "patchNotes": "High Fidelity Audio & Video Passthrough",
       "badge": "MEDIA"
-    }
-  },
-  {
-    "id": "terminal",
-    "name": "System Terminal",
-    "icon": "qrc:/assets/icons/terminal.svg",
-    "exec": "gnome-terminal || ptyxis || xterm",
-    "isSystem": false,
-    "gradientStart": "#232526",
-    "gradientEnd": "#0b0c0d",
-    "context": {
-      "headline": "Fedora Command Console",
-      "description": "Direct access to the underlying Fedora Linux 44 operating system, DNF package manager, and shell tools.",
-      "playtime": "System Tool",
-      "patchNotes": "Bash / Zsh Console Interface",
-      "badge": "SYSTEM"
     }
   },
   {

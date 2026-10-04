@@ -222,6 +222,11 @@ Window {
                 soundController.stopHomeScreenMusic();
                 soundController.playLoginTheme();
             }
+
+            onPowerActionRequested: function(actionId) {
+                stage.activeSection = "tiles";
+                powerTransition.startTransition(actionId);
+            }
         }
 
         // ==========================================
@@ -241,6 +246,7 @@ Window {
             id: libraryView
             z: 100
             isOpen: stage.activeSection === "library"
+            keyboardItem: virtualKeyboard
             onCloseRequested: {
                 stage.activeSection = "tiles";
                 soundController.playBack();
@@ -279,6 +285,10 @@ Window {
                 soundController.stopHomeScreenMusic();
                 soundController.playLoginTheme();
             }
+            onPowerActionRequested: function(actionId) {
+                stage.activeSection = "tiles";
+                powerTransition.startTransition(actionId);
+            }
         }
 
         // ==========================================
@@ -294,6 +304,14 @@ Window {
         VirtualKeyboard {
             id: virtualKeyboard
             z: 500
+        }
+
+        // ==========================================
+        // PS4 POWER TRANSITION OVERLAY
+        // ==========================================
+        PowerTransitionOverlay {
+            id: powerTransition
+            z: 1000
         }
 
 
@@ -755,6 +773,8 @@ Window {
             if (stage.activeSection === "tiles") {
                 stage.activeSection = "library";
                 soundController.playConfirm();
+            } else if (stage.activeSection === "library") {
+                libraryView.activateSearch();
             }
         }
     }
@@ -794,6 +814,11 @@ Window {
             } else if (event.key === Qt.Key_Q || event.key === Qt.Key_F2) {
                 handleQuickMenu();
                 event.accepted = true;
+            } else if (event.key === Qt.Key_Y || event.key === Qt.Key_F3) {
+                if (stage.activeSection === "library") {
+                    libraryView.activateSearch();
+                    event.accepted = true;
+                }
             }
         }
 
