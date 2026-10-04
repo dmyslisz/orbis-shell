@@ -10,6 +10,8 @@ class ProcessLauncher : public QObject
     Q_OBJECT
     Q_PROPERTY(bool isAppRunning READ isAppRunning NOTIFY isAppRunningChanged)
     Q_PROPERTY(QString currentAppName READ currentAppName NOTIFY currentAppNameChanged)
+    Q_PROPERTY(bool hasGamescope READ hasGamescope NOTIFY gamescopeStatusChanged)
+    Q_PROPERTY(bool useGamescope READ useGamescope WRITE setUseGamescope NOTIFY useGamescopeChanged)
 
 public:
     explicit ProcessLauncher(QObject *parent = nullptr);
@@ -17,8 +19,12 @@ public:
 
     bool isAppRunning() const { return m_isRunning; }
     QString currentAppName() const { return m_currentAppName; }
+    bool hasGamescope() const;
+    bool useGamescope() const { return m_useGamescope; }
+    void setUseGamescope(bool use);
 
     void setMainWindow(QQuickWindow *window) { m_mainWindow = window; }
+    void updateTunables(const QJsonObject &systemTunables);
 
     Q_INVOKABLE bool launch(const QString &appName, const QString &commandLine);
     Q_INVOKABLE void requestHome();
@@ -28,6 +34,8 @@ public:
 signals:
     void isAppRunningChanged();
     void currentAppNameChanged();
+    void gamescopeStatusChanged();
+    void useGamescopeChanged();
     void appLaunched(const QString &name);
     void appExited(const QString &name, int exitCode);
 
@@ -37,6 +45,7 @@ private slots:
 private:
     QProcess *m_activeProcess = nullptr;
     bool m_isRunning = false;
+    bool m_useGamescope = true;
     QString m_currentAppName;
     QQuickWindow *m_mainWindow = nullptr;
 };

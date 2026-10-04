@@ -211,6 +211,7 @@ Item {
                         { label: "Kernel Version", value: (root.sysInfo.kernelVersion ? root.sysInfo.kernelVersion : "Linux 6.x") },
                         { label: "Architecture", value: (root.sysInfo.architecture ? root.sysInfo.architecture : "x86_64") },
                         { label: "Desktop Session", value: "Orbis OS Shell (Native Wayland / X11)" },
+                        { label: "Gamescope Sandbox", value: processLauncher.hasGamescope ? (processLauncher.useGamescope ? "Active (Isolated Console Container)" : "Installed (Disabled)") : "Not Installed (dnf install gamescope)" },
                         { label: "System Memory", value: (root.sysInfo.totalRam ? root.sysInfo.totalRam : "Standard Unified Memory") },
                         { label: "Display Mode", value: "1920x1080 @ 60 Hz (Hardware Accelerated Sapphire Wave)" }
                     ]

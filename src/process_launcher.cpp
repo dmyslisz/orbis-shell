@@ -1,6 +1,8 @@
 #include "process_launcher.h"
 #include <QDebug>
 #include <QProcessEnvironment>
+#include <QStandardPaths>
+#include <QJsonObject>
 
 ProcessLauncher::ProcessLauncher(QObject *parent)
     : QObject(parent)
@@ -15,6 +17,26 @@ ProcessLauncher::~ProcessLauncher()
     }
 }
 
+bool ProcessLauncher::hasGamescope() const
+{
+    return !QStandardPaths::findExecutable("gamescope").isEmpty();
+}
+
+void ProcessLauncher::setUseGamescope(bool use)
+{
+    if (m_useGamescope != use) {
+        m_useGamescope = use;
+        emit useGamescopeChanged();
+    }
+}
+
+void ProcessLauncher::updateTunables(const QJsonObject &systemTunables)
+{
+    if (systemTunables.contains("useGamescope")) {
+        setUseGamescope(systemTunables["useGamescope"].toBool(true));
+    }
+}
+
 bool ProcessLauncher::launch(const QString &appName, const QString &commandLine)
 {
     if (commandLine.trimmed().isEmpty()) {
@@ -22,7 +44,15 @@ bool ProcessLauncher::launch(const QString &appName, const QString &commandLine)
         return false;
     }
 
-    qInfo() << "[ProcessLauncher] Launching application:" << appName << "cmd:" << commandLine;
+    QString rawCmd = commandLine.trimmed();
+    QString finalCmd = rawCmd;
+
+    if (m_useGamescope && hasGamescope()) {
+        qInfo() << "[ProcessLauncher] Wrapping execution in Gamescope container (1920x1080 full-screen sandbox).";
+        finalCmd = QString("gamescope -W 1920 -H 1080 -f -e -- sh -c \"exec %1\"").arg(rawCmd);
+    }
+
+    qInfo() << "[ProcessLauncher] Launching application:" << appName << "cmd:" << finalCmd;
 
     if (m_activeProcess) {
         disconnect(m_activeProcess, nullptr, this, nullptr);
@@ -39,10 +69,10 @@ bool ProcessLauncher::launch(const QString &appName, const QString &commandLine)
     env.insert("XDG_CURRENT_DESKTOP", "Orbis");
     m_activeProcess->setProcessEnvironment(env);
 
-    m_activeProcess->startCommand(commandLine.trimmed());
+    m_activeProcess->startCommand(finalCmd);
 
     if (!m_activeProcess->waitForStarted(2000)) {
-        qWarning() << "[ProcessLauncher] Failed to start:" << commandLine << m_activeProcess->errorString();
+        qWarning() << "[ProcessLauncher] Failed to start:" << finalCmd << m_activeProcess->errorString();
         m_activeProcess->deleteLater();
         m_activeProcess = nullptr;
         return false;

@@ -74,6 +74,9 @@ int main(int argc, char *argv[])
         if (tunables.contains("navigation")) {
             gamepadManager.updateTunables(tunables["navigation"].toObject());
         }
+        if (tunables.contains("system")) {
+            processLauncher.updateTunables(tunables["system"].toObject());
+        }
     });
 
     QQmlApplicationEngine engine;

@@ -32,6 +32,7 @@
   "system": {
     "scanXdgApps": true,
     "scanSteamGames": true,
-    "showClock24h": false
+    "showClock24h": false,
+    "useGamescope": true
   }
 }
