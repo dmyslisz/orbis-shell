@@ -29,6 +29,7 @@ SoundController::SoundController(const QString &baseAssetDir, QObject *parent)
     initSounds();
 
     connect(&m_bgmLoopTimer, &QTimer::timeout, this, &SoundController::checkBgmLoop);
+    connect(&m_loginLoopTimer, &QTimer::timeout, this, &SoundController::checkLoginLoop);
 }
 
 SoundController::~SoundController()
@@ -40,6 +41,12 @@ SoundController::~SoundController()
     freeSdlSample(m_sdlOptions);
     freeSdlSample(m_sdlBootChime);
     freeSdlSample(m_sdlHomeScreenMusic);
+    freeSdlSample(m_sdlLoginFirst);
+    freeSdlSample(m_sdlLoginLoop);
+    if (m_loginStream) {
+        SDL_DestroyAudioStream(m_loginStream);
+        m_loginStream = nullptr;
+    }
     freeSdlSample(m_sdlLogin);
     freeSdlSample(m_sdlLogout);
     freeSdlSample(m_sdlNotification);
@@ -90,7 +97,11 @@ void SoundController::setMasterVolume(double vol)
 {
     m_masterVolume = qBound(0.0, vol, 1.0);
     emit masterVolumeChanged();
-#ifndef HAVE_SDL3
+#ifdef HAVE_SDL3
+    if (m_loginStream) {
+        SDL_SetAudioStreamGain(m_loginStream, qBound(0.0f, static_cast<float>(m_masterVolume * m_bgmVolume), 1.0f));
+    }
+#else
     if (m_bgmAudioOutput) {
         m_bgmAudioOutput->setVolume(static_cast<float>(m_masterVolume * m_bgmVolume));
     }
@@ -107,7 +118,11 @@ void SoundController::setBgmVolume(double vol)
 {
     m_bgmVolume = qBound(0.0, vol, 1.0);
     emit bgmVolumeChanged();
-#ifndef HAVE_SDL3
+#ifdef HAVE_SDL3
+    if (m_loginStream) {
+        SDL_SetAudioStreamGain(m_loginStream, qBound(0.0f, static_cast<float>(m_masterVolume * m_bgmVolume), 1.0f));
+    }
+#else
     if (m_bgmAudioOutput) {
         m_bgmAudioOutput->setVolume(static_cast<float>(m_masterVolume * m_bgmVolume));
     }
@@ -214,6 +229,8 @@ void SoundController::initSounds()
     m_sdlOptions = loadSdlSample("options.wav");
     m_sdlBootChime = loadSdlSample("boot_chime.wav");
     m_sdlHomeScreenMusic = loadSdlSample("home_screen_music.wav");
+    m_sdlLoginFirst = loadSdlSample("login_first.wav");
+    m_sdlLoginLoop = loadSdlSample("login_loop.wav");
     m_sdlLogin = loadSdlSample("login.wav");
     m_sdlLogout = loadSdlSample("logout.wav");
     m_sdlNotification = loadSdlSample("notification.wav");
@@ -247,18 +264,68 @@ void SoundController::playOptions()
     playSdlSample(m_sdlOptions, static_cast<float>(m_masterVolume * m_sfxVolume));
 }
 
+void SoundController::playLoginTheme()
+{
+    m_loginThemePlaying = true;
+    if (!m_enabled || !m_bgmEnabled) return;
+#ifdef HAVE_SDL3
+    if (!m_sdlAudioReady) return;
+    if (!m_loginStream && m_sdlLoginFirst.data) {
+        m_loginStream = SDL_CreateAudioStream(&m_sdlLoginFirst.spec, nullptr);
+        if (m_loginStream) {
+            SDL_BindAudioStream(m_audioDevice, m_loginStream);
+        }
+    }
+    if (m_loginStream && m_sdlLoginFirst.data && m_sdlLoginLoop.data) {
+        float gain = static_cast<float>(m_masterVolume * m_bgmVolume);
+        SDL_SetAudioStreamGain(m_loginStream, qBound(0.0f, gain, 1.0f));
+        SDL_ClearAudioStream(m_loginStream);
+        SDL_PutAudioStreamData(m_loginStream, m_sdlLoginFirst.data, m_sdlLoginFirst.length);
+        SDL_PutAudioStreamData(m_loginStream, m_sdlLoginLoop.data, m_sdlLoginLoop.length);
+        SDL_FlushAudioStream(m_loginStream);
+        m_loginLoopTimer.start(1000);
+    }
+#endif
+}
+
+void SoundController::stopLoginTheme()
+{
+    m_loginThemePlaying = false;
+    m_loginLoopTimer.stop();
+#ifdef HAVE_SDL3
+    if (m_loginStream) {
+        SDL_ClearAudioStream(m_loginStream);
+    }
+#endif
+}
+
+void SoundController::checkLoginLoop()
+{
+    if (!m_loginThemePlaying || !m_enabled || !m_bgmEnabled) return;
+#ifdef HAVE_SDL3
+    if (m_loginStream && m_sdlLoginLoop.data) {
+        int queued = SDL_GetAudioStreamQueued(m_loginStream);
+        if (queued < static_cast<int>(m_sdlLoginLoop.length)) {
+            SDL_PutAudioStreamData(m_loginStream, m_sdlLoginLoop.data, m_sdlLoginLoop.length);
+            SDL_FlushAudioStream(m_loginStream);
+        }
+    }
+#endif
+}
+
 void SoundController::playBootChime()
 {
-    playSdlSample(m_sdlBootChime, static_cast<float>(m_masterVolume * 0.75f));
+    playLoginTheme();
 }
 
 void SoundController::stopBootChime()
 {
-    stopSdlSample(m_sdlBootChime);
+    stopLoginTheme();
 }
 
 void SoundController::playHomeScreenMusic()
 {
+    stopLoginTheme();
     m_homeScreenMusicPlaying = true;
     if (!m_enabled || !m_bgmEnabled) return;
     playSdlSample(m_sdlHomeScreenMusic, static_cast<float>(m_masterVolume * m_bgmVolume), true);
@@ -417,6 +484,20 @@ void SoundController::stopBootChime()
     if (m_bootChimeSound) {
         m_bootChimeSound->stop();
     }
+}
+
+void SoundController::playLoginTheme()
+{
+    playBootChime();
+}
+
+void SoundController::stopLoginTheme()
+{
+    stopBootChime();
+}
+
+void SoundController::checkLoginLoop()
+{
 }
 
 void SoundController::playHomeScreenMusic()

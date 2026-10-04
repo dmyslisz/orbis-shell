@@ -6,126 +6,71 @@ Item {
 
     signal proceed()
 
-    // Ambient radial pulse glow in background
-    Rectangle {
-        anchors.centerIn: parent
-        width: 600
-        height: 600
-        radius: 300
-        color: "#0a2860"
-        opacity: 0.35
+    // Top-Left Orbis OS Wordmark & Emblem (Photo 1)
+    Row {
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.leftMargin: 80
+        anchors.topMargin: 56
+        spacing: 16
 
-        SequentialAnimation on scale {
-            loops: Animation.Infinite
-            NumberAnimation { to: 1.15; duration: 2400; easing.type: Easing.InOutSine }
-            NumberAnimation { to: 0.95; duration: 2400; easing.type: Easing.InOutSine }
+        Image {
+            width: 44
+            height: 44
+            source: "qrc:/assets/icons/launcher_logo.svg"
+            fillMode: Image.PreserveAspectFit
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Text {
+            text: "ORBIS OS"
+            color: "#ffffff"
+            font.pixelSize: 34
+            font.weight: Font.DemiBold
+            font.letterSpacing: 3
+            anchors.verticalCenter: parent.verticalCenter
         }
     }
 
+    // Center Welcome Prompt (Photo 1)
     Column {
         anchors.centerIn: parent
-        spacing: 44
+        spacing: 18
 
-        // Console Gamepad silhouette graphic with pulsing Guide button
-        Item {
-            width: 300
-            height: 200
+        Text {
+            text: "Welcome Back to Orbis OS"
+            color: "#ffffff"
+            font.pixelSize: 32
+            font.weight: Font.Normal
+            horizontalAlignment: Text.AlignHCenter
             anchors.horizontalCenter: parent.horizontalCenter
-
-            Image {
-                anchors.centerIn: parent
-                width: 250
-                height: 170
-                source: "qrc:/assets/icons/boot_controllersetup1.png"
-                fillMode: Image.PreserveAspectFit
-                opacity: 0.95
-            }
-
-            // Glowing Guide button circle indicator
-            Rectangle {
-                width: 28
-                height: 28
-                radius: 14
-                color: "#1a4080"
-                border.color: "#80d0ff"
-                border.width: 2.5
-                anchors.centerIn: parent
-                anchors.verticalCenterOffset: 16
-
-                SequentialAnimation on opacity {
-                    loops: Animation.Infinite
-                    NumberAnimation { to: 1.0; duration: 800; easing.type: Easing.InOutSine }
-                    NumberAnimation { to: 0.25; duration: 800; easing.type: Easing.InOutSine }
-                }
-
-                // Inner pulsing light
-                Rectangle {
-                    anchors.centerIn: parent
-                    width: 12
-                    height: 12
-                    radius: 6
-                    color: "#ffffff"
-                    opacity: 0.9
-                }
-            }
         }
 
-        // Welcome prompt text
-        Column {
-            spacing: 14
+        Text {
+            text: "Press the Guide button to use the controller."
+            color: "#b0d0f8"
+            font.pixelSize: 20
+            font.weight: Font.Light
+            horizontalAlignment: Text.AlignHCenter
             anchors.horizontalCenter: parent.horizontalCenter
-
-            Text {
-                text: "Welcome to Orbis OS"
-                color: "#ffffff"
-                font.pixelSize: 36
-                font.weight: Font.Normal
-                horizontalAlignment: Text.AlignHCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-
-            Text {
-                text: "Press the Guide button to use the controller."
-                color: "#a8c8f0"
-                font.pixelSize: 20
-                font.weight: Font.Normal
-                horizontalAlignment: Text.AlignHCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-
-            Text {
-                text: "Press [Enter] / [Home] on keyboard or Guide on Gamepad"
-                color: "#7090b8"
-                font.pixelSize: 15
-                font.weight: Font.Light
-                horizontalAlignment: Text.AlignHCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                opacity: 0.8
-            }
         }
+    }
 
-        // Bottom controller hints
-        Row {
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 32
+    // Subtle keyboard / controller interaction hint at bottom
+    Text {
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 48
+        anchors.horizontalCenter: parent.horizontalCenter
+        text: "Press [Enter] or [Home] on keyboard / Guide button on controller"
+        color: "#608cb8"
+        font.pixelSize: 15
+        font.weight: Font.Light
+        opacity: 0.65
+    }
 
-            Row {
-                spacing: 8
-                anchors.verticalCenter: parent.verticalCenter
-                Image {
-                    width: 22
-                    height: 22
-                    source: "qrc:/assets/icons/buttons/PS4_Cross.png"
-                    fillMode: Image.PreserveAspectFit
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-                Text {
-                    text: "Enter"
-                    color: "#ffffff"
-                    font.pixelSize: 16
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-            }
-        }
+    // Global click to proceed
+    MouseArea {
+        anchors.fill: parent
+        onClicked: root.proceed()
     }
 }

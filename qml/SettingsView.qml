@@ -122,12 +122,20 @@ Item {
 
                     Rectangle {
                         anchors.fill: parent
-                        radius: 6
-                        color: isCurrent ? "#ffffff" : "#0e1e3a"
-                        border.color: isCurrent ? "#ffffff" : "#20ffffff"
-                        border.width: isCurrent ? 2 : 1
+                        radius: 2
+                        color: isCurrent ? "#16325c" : "transparent"
+                        border.color: isCurrent ? "#ffffff" : "transparent"
+                        border.width: isCurrent ? 2.5 : 0
 
-                        Behavior on color { ColorAnimation { duration: 120 } }
+                        // Bottom separator line when not focused
+                        Rectangle {
+                            anchors.bottom: parent.bottom
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            height: 1
+                            color: "#18ffffff"
+                            visible: !isCurrent
+                        }
 
                         Row {
                             anchors.fill: parent
@@ -141,14 +149,14 @@ Item {
                                 source: modelData.icon
                                 fillMode: Image.PreserveAspectFit
                                 anchors.verticalCenter: parent.verticalCenter
-                                opacity: isCurrent ? 0.95 : 0.75
+                                opacity: isCurrent ? 1.0 : 0.8
                             }
 
                             Text {
                                 text: modelData.name
-                                color: isCurrent ? "#0a1d3d" : "#ffffff"
+                                color: "#ffffff"
                                 font.pixelSize: 20
-                                font.weight: isCurrent ? Font.DemiBold : Font.Normal
+                                font.weight: isCurrent ? Font.Medium : Font.Normal
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                         }
@@ -159,7 +167,7 @@ Item {
                             anchors.rightMargin: 24
                             anchors.verticalCenter: parent.verticalCenter
                             text: "›"
-                            color: isCurrent ? "#0a1d3d" : "#7090b8"
+                            color: isCurrent ? "#ffffff" : "#7090b8"
                             font.pixelSize: 28
                             font.weight: Font.Light
                         }
@@ -250,10 +258,10 @@ Item {
                 Rectangle {
                     width: parent.width
                     height: 84
-                    radius: 6
-                    color: root.subSelectedIndex === 0 ? "#ffffff" : "#0e1e3a"
+                    radius: 4
+                    color: root.subSelectedIndex === 0 ? "#16325c" : "#0e1e3a"
                     border.color: root.subSelectedIndex === 0 ? "#ffffff" : "#20ffffff"
-                    border.width: root.subSelectedIndex === 0 ? 2 : 1
+                    border.width: root.subSelectedIndex === 0 ? 2.5 : 1
 
                     Item {
                         anchors.fill: parent
@@ -265,13 +273,13 @@ Item {
                             spacing: 4
                             Text {
                                 text: "Master Audio Volume"
-                                color: root.subSelectedIndex === 0 ? "#0a1d3d" : "#ffffff"
+                                color: "#ffffff"
                                 font.pixelSize: 19
                                 font.weight: Font.DemiBold
                             }
                             Text {
                                 text: "Adjust output volume via PipeWire sink"
-                                color: root.subSelectedIndex === 0 ? "#305080" : "#80a8d8"
+                                color: root.subSelectedIndex === 0 ? "#b0d0f8" : "#80a8d8"
                                 font.pixelSize: 14
                             }
                         }
@@ -283,7 +291,7 @@ Item {
 
                             Text {
                                 text: "◀"
-                                color: root.subSelectedIndex === 0 ? "#0a1d3d" : "#a0c0e8"
+                                color: "#ffffff"
                                 font.pixelSize: 16
                                 anchors.verticalCenter: parent.verticalCenter
                             }
@@ -292,7 +300,7 @@ Item {
                                 width: 280
                                 height: 14
                                 radius: 7
-                                color: root.subSelectedIndex === 0 ? "#d0e4ff" : "#0a1628"
+                                color: "#0a1628"
                                 border.color: root.subSelectedIndex === 0 ? "#80b0f0" : "#204070"
                                 border.width: 1
                                 anchors.verticalCenter: parent.verticalCenter
@@ -307,14 +315,14 @@ Item {
 
                             Text {
                                 text: "▶"
-                                color: root.subSelectedIndex === 0 ? "#0a1d3d" : "#a0c0e8"
+                                color: "#ffffff"
                                 font.pixelSize: 16
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
                             Text {
                                 text: systemManager.systemVolume + "%"
-                                color: root.subSelectedIndex === 0 ? "#0a1d3d" : "#ffffff"
+                                color: "#ffffff"
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
                                 anchors.verticalCenter: parent.verticalCenter
@@ -334,10 +342,10 @@ Item {
                 Rectangle {
                     width: parent.width
                     height: 72
-                    radius: 6
-                    color: root.subSelectedIndex === 1 ? "#ffffff" : "#0e1e3a"
+                    radius: 4
+                    color: root.subSelectedIndex === 1 ? "#16325c" : "#0e1e3a"
                     border.color: root.subSelectedIndex === 1 ? "#ffffff" : "#20ffffff"
-                    border.width: root.subSelectedIndex === 1 ? 2 : 1
+                    border.width: root.subSelectedIndex === 1 ? 2.5 : 1
 
                     Item {
                         anchors.fill: parent
@@ -349,13 +357,13 @@ Item {
                             spacing: 4
                             Text {
                                 text: "Mute System Audio"
-                                color: root.subSelectedIndex === 1 ? "#0a1d3d" : "#ffffff"
+                                color: "#ffffff"
                                 font.pixelSize: 19
                                 font.weight: Font.DemiBold
                             }
                             Text {
                                 text: systemManager.isMuted ? "All sound output currently muted" : "Audio is active"
-                                color: root.subSelectedIndex === 1 ? "#305080" : "#80a8d8"
+                                color: root.subSelectedIndex === 1 ? "#b0d0f8" : "#80a8d8"
                                 font.pixelSize: 14
                             }
                         }
@@ -366,7 +374,7 @@ Item {
                             width: 80
                             height: 32
                             radius: 16
-                            color: systemManager.isMuted ? "#ef5350" : (root.subSelectedIndex === 1 ? "#1a3560" : "#204278")
+                            color: systemManager.isMuted ? "#ef5350" : (root.subSelectedIndex === 1 ? "#006FCD" : "#204278")
 
                             Text {
                                 anchors.centerIn: parent
@@ -392,10 +400,10 @@ Item {
                 Rectangle {
                     width: parent.width
                     height: 72
-                    radius: 6
-                    color: root.subSelectedIndex === 2 ? "#ffffff" : "#0e1e3a"
+                    radius: 4
+                    color: root.subSelectedIndex === 2 ? "#16325c" : "#0e1e3a"
                     border.color: root.subSelectedIndex === 2 ? "#ffffff" : "#20ffffff"
-                    border.width: root.subSelectedIndex === 2 ? 2 : 1
+                    border.width: root.subSelectedIndex === 2 ? 2.5 : 1
 
                     Item {
                         anchors.fill: parent
@@ -407,13 +415,13 @@ Item {
                             spacing: 4
                             Text {
                                 text: "Home Screen Music (BGM)"
-                                color: root.subSelectedIndex === 2 ? "#0a1d3d" : "#ffffff"
+                                color: "#ffffff"
                                 font.pixelSize: 19
                                 font.weight: Font.DemiBold
                             }
                             Text {
                                 text: "Continuous seamless ambient audio loop in home menu"
-                                color: root.subSelectedIndex === 2 ? "#305080" : "#80a8d8"
+                                color: root.subSelectedIndex === 2 ? "#b0d0f8" : "#80a8d8"
                                 font.pixelSize: 14
                             }
                         }
@@ -626,10 +634,10 @@ Item {
                         required property var modelData
                         width: parent.width
                         height: 72
-                        radius: 6
-                        color: root.subSelectedIndex === index ? "#ffffff" : "#0e1e3a"
+                        radius: 4
+                        color: root.subSelectedIndex === index ? "#16325c" : "#0e1e3a"
                         border.color: root.subSelectedIndex === index ? "#ffffff" : "#20ffffff"
-                        border.width: root.subSelectedIndex === index ? 2 : 1
+                        border.width: root.subSelectedIndex === index ? 2.5 : 1
 
                         Row {
                             anchors.fill: parent
@@ -639,13 +647,13 @@ Item {
                                 spacing: 4
                                 Text {
                                     text: modelData.title
-                                    color: root.subSelectedIndex === index ? "#0a1d3d" : "#ffffff"
+                                    color: "#ffffff"
                                     font.pixelSize: 19
                                     font.weight: Font.DemiBold
                                 }
                                 Text {
                                     text: modelData.desc
-                                    color: root.subSelectedIndex === index ? "#305080" : "#80a8d8"
+                                    color: root.subSelectedIndex === index ? "#b0d0f8" : "#80a8d8"
                                     font.pixelSize: 14
                                 }
                             }

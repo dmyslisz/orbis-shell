@@ -51,6 +51,8 @@ public:
     Q_INVOKABLE void playOptions();
     Q_INVOKABLE void playBootChime();
     Q_INVOKABLE void stopBootChime();
+    Q_INVOKABLE void playLoginTheme();
+    Q_INVOKABLE void stopLoginTheme();
     Q_INVOKABLE void playHomeScreenMusic();
     Q_INVOKABLE void stopHomeScreenMusic();
     Q_INVOKABLE void playLogin();
@@ -82,9 +84,12 @@ private:
     double m_bgmVolume = 0.40;
     bool m_pitchVariation = true;
     bool m_homeScreenMusicPlaying = false;
+    bool m_loginThemePlaying = false;
     QTimer m_bgmLoopTimer;
+    QTimer m_loginLoopTimer;
 
     void checkBgmLoop();
+    void checkLoginLoop();
 
     int m_lastTickIdx = 0;
 
@@ -110,6 +115,9 @@ private:
     SoundSample m_sdlOptions;
     SoundSample m_sdlBootChime;
     SoundSample m_sdlHomeScreenMusic;
+    SoundSample m_sdlLoginFirst;
+    SoundSample m_sdlLoginLoop;
+    SDL_AudioStream *m_loginStream = nullptr;
     SoundSample m_sdlLogin;
     SoundSample m_sdlLogout;
     SoundSample m_sdlNotification;

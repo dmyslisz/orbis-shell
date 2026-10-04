@@ -45,7 +45,7 @@ Window {
         property string currentUserAvatar: "qrc:/assets/avatars/avatar_luchador.svg"
 
         Component.onCompleted: {
-            soundController.playBootChime();
+            soundController.playLoginTheme();
         }
 
         // ==========================================
@@ -80,6 +80,7 @@ Window {
         // ==========================================
         UserSelectScreen {
             id: userSelectScreen
+            keyboardItem: virtualKeyboard
             opacity: stage.activeSection === "users" ? 1.0 : 0.0
             visible: opacity > 0.01
             enabled: stage.activeSection === "users"
@@ -91,15 +92,13 @@ Window {
                 }
                 configManager.activeUser = user.name;
                 stage.activeSection = "tiles";
-                soundController.stopBootChime();
+                soundController.stopLoginTheme();
+                soundController.playLogin();
                 soundController.playHomeScreenMusic();
-                controllerToast.trigger();
             }
 
             onReturnToWelcome: {
                 stage.activeSection = "welcome";
-                soundController.stopHomeScreenMusic();
-                soundController.playBootChime();
             }
 
             Behavior on opacity {
@@ -269,7 +268,7 @@ Window {
             onSwitchUserRequested: {
                 stage.activeSection = "users";
                 soundController.stopHomeScreenMusic();
-                soundController.playBootChime();
+                soundController.playLoginTheme();
             }
         }
 
@@ -281,121 +280,11 @@ Window {
         }
 
         // ==========================================
-        // 10. AUTHENTIC PS4 CONTROLLER CONNECTED TOAST
+        // AUTHENTIC PS4 VIRTUAL KEYBOARD OVERLAY
         // ==========================================
-        Item {
-            id: controllerToast
-            width: 290
-            height: 82
-            y: 110
-            x: isVisible ? 0 : -width
-            z: 300
-
-            property bool isVisible: false
-
-            Behavior on x {
-                NumberAnimation { duration: 320; easing.type: Easing.OutCubic }
-            }
-
-            Timer {
-                id: controllerToastTimer
-                interval: 3800
-                onTriggered: controllerToast.isVisible = false
-            }
-
-            function trigger() {
-                isVisible = true;
-                controllerToastTimer.restart();
-            }
-
-            Column {
-                anchors.fill: parent
-
-                Rectangle {
-                    width: parent.width
-                    height: 40
-                    color: "#90182840"
-                    border.color: "#30ffffff"
-                    border.width: 1
-
-                    Row {
-                        anchors.left: parent.left
-                        anchors.leftMargin: 16
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 10
-
-                        Rectangle {
-                            width: 24
-                            height: 24
-                            radius: 3
-                            color: "#1a3560"
-                            clip: true
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            Image {
-                                anchors.fill: parent
-                                source: stage.currentUserAvatar
-                                fillMode: Image.PreserveAspectCrop
-                            }
-                        }
-
-                        Text {
-                            text: stage.currentUserName
-                            color: "#ffffff"
-                            font.pixelSize: 15
-                            font.weight: Font.Medium
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-                }
-
-                Rectangle {
-                    width: parent.width
-                    height: 42
-                    color: "#ffffff"
-
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 16
-
-                        Text {
-                            text: "🎮"
-                            font.pixelSize: 20
-                            color: "#0a1d3d"
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Row {
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 3
-
-                            Rectangle {
-                                width: 30
-                                height: 14
-                                radius: 2
-                                color: "transparent"
-                                border.color: "#0a1d3d"
-                                border.width: 1.5
-
-                                Row {
-                                    anchors.centerIn: parent
-                                    spacing: 2
-                                    Rectangle { width: 6; height: 8; color: "#0a1d3d" }
-                                    Rectangle { width: 6; height: 8; color: "#0a1d3d" }
-                                    Rectangle { width: 6; height: 8; color: "#0a1d3d" }
-                                }
-                            }
-
-                            Rectangle {
-                                width: 2
-                                height: 6
-                                color: "#0a1d3d"
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-                    }
-                }
-            }
+        VirtualKeyboard {
+            id: virtualKeyboard
+            z: 500
         }
 
 
@@ -590,6 +479,10 @@ Window {
 
     // Navigation and Action Handlers
     function handleLeft() {
+        if (virtualKeyboard.isOpen) {
+            virtualKeyboard.selectLeft();
+            return;
+        }
         if (stage.activeSection === "users") {
             userSelectScreen.selectPrevious();
         } else if (stage.activeSection === "tiles") {
@@ -608,6 +501,10 @@ Window {
     }
 
     function handleRight() {
+        if (virtualKeyboard.isOpen) {
+            virtualKeyboard.selectRight();
+            return;
+        }
         if (stage.activeSection === "users") {
             userSelectScreen.selectNext();
         } else if (stage.activeSection === "tiles") {
@@ -626,7 +523,13 @@ Window {
     }
 
     function handleUp() {
-        if (stage.activeSection === "tiles") {
+        if (virtualKeyboard.isOpen) {
+            virtualKeyboard.selectUp();
+            return;
+        }
+        if (stage.activeSection === "users") {
+            userSelectScreen.selectUp();
+        } else if (stage.activeSection === "tiles") {
             stage.activeSection = "topbar";
             soundController.playTick();
         } else if (stage.activeSection === "deck") {
@@ -648,7 +551,13 @@ Window {
     }
 
     function handleDown() {
-        if (stage.activeSection === "topbar") {
+        if (virtualKeyboard.isOpen) {
+            virtualKeyboard.selectDown();
+            return;
+        }
+        if (stage.activeSection === "users") {
+            userSelectScreen.selectDown();
+        } else if (stage.activeSection === "topbar") {
             stage.activeSection = "tiles";
             soundController.playTick();
         } else if (stage.activeSection === "tiles") {
@@ -670,6 +579,10 @@ Window {
     }
 
     function handleConfirm() {
+        if (virtualKeyboard.isOpen) {
+            virtualKeyboard.triggerCurrent();
+            return;
+        }
         if (stage.activeSection === "welcome") {
             stage.activeSection = "users";
             soundController.playConfirm();
@@ -705,6 +618,10 @@ Window {
     }
 
     function handleBack() {
+        if (virtualKeyboard.isOpen) {
+            virtualKeyboard.close();
+            return;
+        }
         if (stage.activeSection === "users") {
             userSelectScreen.cancelCurrent();
         } else if (stage.activeSection === "deck") {
@@ -738,6 +655,11 @@ Window {
     }
 
     function handleOptions() {
+        if (virtualKeyboard.isOpen) return;
+        if (stage.activeSection === "users") {
+            userSelectScreen.openOptions();
+            return;
+        }
         soundController.playOptions();
         if (stage.activeSection === "options") {
             stage.activeSection = "tiles";
@@ -791,10 +713,7 @@ Window {
         focus: true
         Keys.onPressed: function(event) {
             if (event.isAutoRepeat) return;
-
-            if (stage.activeSection === "users" && userSelectScreen.isCreatingUser) {
-                return; // Let TextInput handle keys
-            }
+            if (virtualKeyboard.isOpen) return;
 
             if (event.key === Qt.Key_Left || event.key === Qt.Key_A) {
                 gamepadManager.handleNavigationPress(1);

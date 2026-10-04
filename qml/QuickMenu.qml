@@ -139,11 +139,9 @@ Item {
                             Rectangle {
                                 anchors.fill: parent
                                 radius: 4
-                                color: isFocused ? "#ffffff" : (isCurrent ? "#244270" : "transparent")
+                                color: isFocused ? "#16325c" : (isCurrent ? "#14294a" : "transparent")
                                 border.color: isFocused ? "#ffffff" : "transparent"
-                                border.width: isFocused ? 2 : 0
-
-                                Behavior on color { ColorAnimation { duration: 120 } }
+                                border.width: isFocused ? 2.5 : 0
 
                                 Row {
                                     anchors.fill: parent
@@ -157,15 +155,14 @@ Item {
                                         source: modelData.icon
                                         fillMode: Image.PreserveAspectFit
                                         anchors.verticalCenter: parent.verticalCenter
-                                        // Strictly monochrome white icon
-                                        opacity: isFocused ? 0.95 : 0.75
+                                        opacity: isFocused ? 1.0 : 0.8
                                     }
 
                                     Text {
                                         text: modelData.name
-                                        color: isFocused ? "#0a1d3d" : "#ffffff"
+                                        color: "#ffffff"
                                         font.pixelSize: 17
-                                        font.weight: isFocused ? Font.DemiBold : Font.Normal
+                                        font.weight: isFocused ? Font.Medium : Font.Normal
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
                                 }
@@ -281,10 +278,10 @@ Item {
                 Rectangle {
                     width: parent.width - 20
                     height: 96
-                    radius: 6
-                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#142848"
+                    radius: 4
+                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#16325c" : "#142848"
                     border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#30ffffff"
-                    border.width: 2
+                    border.width: (root.activePane === 1 && root.rightSelectedIndex === 0) ? 2.5 : 1
 
                     Column {
                         anchors.fill: parent
@@ -299,7 +296,7 @@ Item {
                                 anchors.left: parent.left
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: "Master Volume"
-                                color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#ffffff"
+                                color: "#ffffff"
                                 font.pixelSize: 16
                                 font.weight: Font.Medium
                             }
@@ -308,7 +305,7 @@ Item {
                                 anchors.right: parent.right
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: systemManager.systemVolume + "%"
-                                color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#006FCD" : "#80c0ff"
+                                color: "#ffffff"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                             }
@@ -324,13 +321,15 @@ Item {
                                 width: 28
                                 height: 28
                                 radius: 4
-                                color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#d0e4ff" : "#1a355a"
+                                color: "#1a355a"
+                                border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#4070a8"
+                                border.width: 1
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: "◀"
-                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#ffffff"
+                                    color: "#ffffff"
                                     font.pixelSize: 13
                                 }
 
@@ -350,8 +349,8 @@ Item {
                                 width: 240
                                 height: 14
                                 radius: 7
-                                color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#c5dcf7" : "#0c1a32"
-                                border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#70a8e8" : "#204070"
+                                color: "#0c1a32"
+                                border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#204070"
                                 border.width: 1
                                 anchors.verticalCenter: parent.verticalCenter
 
@@ -368,13 +367,15 @@ Item {
                                 width: 28
                                 height: 28
                                 radius: 4
-                                color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#d0e4ff" : "#1a355a"
+                                color: "#1a355a"
+                                border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#4070a8"
+                                border.width: 1
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 Text {
                                     anchors.centerIn: parent
                                     text: "▶"
-                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#ffffff"
+                                    color: "#ffffff"
                                     font.pixelSize: 13
                                 }
 
@@ -397,9 +398,9 @@ Item {
                     width: parent.width - 20
                     height: 56
                     radius: 4
-                    color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#ffffff" : "#142848"
+                    color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#16325c" : "#142848"
                     border.color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#ffffff" : "#30ffffff"
-                    border.width: 2
+                    border.width: (root.activePane === 1 && root.rightSelectedIndex === 1) ? 2.5 : 1
 
                     Item {
                         anchors.fill: parent
@@ -419,7 +420,7 @@ Item {
 
                             Text {
                                 text: systemManager.isMuted ? "Unmute Audio" : "Mute Audio"
-                                color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#0a1d3d" : "#ffffff"
+                                color: "#ffffff"
                                 font.pixelSize: 17
                                 font.weight: Font.Medium
                                 anchors.verticalCenter: parent.verticalCenter
@@ -466,9 +467,9 @@ Item {
                     width: parent.width - 20
                     height: 56
                     radius: 4
-                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#142848"
+                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#16325c" : "#142848"
                     border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#30ffffff"
-                    border.width: 2
+                    border.width: (root.activePane === 1 && root.rightSelectedIndex === 0) ? 2.5 : 1
 
                     Row {
                         anchors.fill: parent
@@ -484,7 +485,7 @@ Item {
 
                         Text {
                             text: "Enter Rest Mode"
-                            color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#ffffff"
+                            color: "#ffffff"
                             font.pixelSize: 17
                             font.weight: Font.Medium
                             anchors.verticalCenter: parent.verticalCenter
@@ -505,9 +506,9 @@ Item {
                     width: parent.width - 20
                     height: 56
                     radius: 4
-                    color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#ffffff" : "#142848"
+                    color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#16325c" : "#142848"
                     border.color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#ffffff" : "#30ffffff"
-                    border.width: 2
+                    border.width: (root.activePane === 1 && root.rightSelectedIndex === 1) ? 2.5 : 1
 
                     Row {
                         anchors.fill: parent
@@ -523,7 +524,7 @@ Item {
 
                         Text {
                             text: "Turn Off System"
-                            color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#0a1d3d" : "#ffffff"
+                            color: "#ffffff"
                             font.pixelSize: 17
                             font.weight: Font.Medium
                             anchors.verticalCenter: parent.verticalCenter
@@ -544,9 +545,9 @@ Item {
                     width: parent.width - 20
                     height: 56
                     radius: 4
-                    color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#ffffff" : "#142848"
+                    color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#16325c" : "#142848"
                     border.color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#ffffff" : "#30ffffff"
-                    border.width: 2
+                    border.width: (root.activePane === 1 && root.rightSelectedIndex === 2) ? 2.5 : 1
 
                     Row {
                         anchors.fill: parent
@@ -562,7 +563,7 @@ Item {
 
                         Text {
                             text: "Restart System"
-                            color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#0a1d3d" : "#ffffff"
+                            color: "#ffffff"
                             font.pixelSize: 17
                             font.weight: Font.Medium
                             anchors.verticalCenter: parent.verticalCenter

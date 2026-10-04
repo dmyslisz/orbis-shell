@@ -275,6 +275,17 @@ void ConfigManager::deleteUser(const QString &userId)
         }
     }
     emit usersChanged();
+
+    QString path = m_configDir + "/users.json";
+    QFile file(path);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QJsonArray arr;
+        for (const auto &u : m_users) {
+            arr.append(QJsonObject::fromVariantMap(u.toMap()));
+        }
+        file.write(QJsonDocument(arr).toJson(QJsonDocument::Indented));
+        file.close();
+    }
 }
 
 void ConfigManager::unlockTrophy(const QString &trophyId)
