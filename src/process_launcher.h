@@ -43,9 +43,15 @@ private slots:
     void onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
+    bool startProcess(const QString &appName, const QString &cmd, bool isGamescope);
+
     QProcess *m_activeProcess = nullptr;
     bool m_isRunning = false;
     bool m_useGamescope = true;
+    bool m_wasLaunchedWithGamescope = false;
+    qint64 m_launchTimeMs = 0;
+    QString m_lastAppName;
+    QString m_lastRawCmd;
     QString m_currentAppName;
     QQuickWindow *m_mainWindow = nullptr;
 };
