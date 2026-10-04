@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QUrl>
 #include <QDebug>
 #include <QRandomGenerator>
 

@@ -4,6 +4,8 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <QStandardPaths>
+#include <QUrl>
+#include <QRegularExpression>
 #include <QDebug>
 
 AppScanner::AppScanner(QObject *parent)
