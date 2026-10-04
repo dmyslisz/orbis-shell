@@ -22,6 +22,7 @@ public:
 
     Q_INVOKABLE bool launch(const QString &appName, const QString &commandLine);
     Q_INVOKABLE void requestHome();
+    Q_INVOKABLE void lowerToApp();
     Q_INVOKABLE void terminateCurrentApp();
 
 signals:

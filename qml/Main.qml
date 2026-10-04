@@ -525,6 +525,14 @@ Window {
             return;
         }
 
+        // If the selected app is already running, return focus to it like PS4
+        if (processLauncher.isAppRunning && processLauncher.currentAppName === item.name) {
+            soundController.playConfirm();
+            soundController.stopHomeScreenMusic();
+            processLauncher.lowerToApp();
+            return;
+        }
+
         launchAppDirect(item);
     }
 
@@ -535,6 +543,9 @@ Window {
             var started = processLauncher.launch(item.name, item.exec);
             if (!started) {
                 showNotification("Could not start '" + item.exec + "' (check if installed)");
+            } else {
+                // Stop home screen music while app/game is active
+                soundController.stopHomeScreenMusic();
             }
         } else {
             showNotification(item.name + " selected");
@@ -742,18 +753,33 @@ Window {
         if (stage.activeSection === "welcome") {
             stage.activeSection = "users";
             soundController.playConfirm();
-        } else if (stage.activeSection === "quickmenu" || stage.activeSection === "options" || stage.activeSection === "settings" || stage.activeSection === "library" || stage.activeSection === "trophies" || stage.activeSection === "notifications" || stage.activeSection === "power" || stage.activeSection === "deck" || stage.activeSection === "topbar") {
+        } else {
+            processLauncher.requestHome();
             stage.activeSection = "tiles";
+            soundController.playHomeScreenMusic();
             soundController.playBack();
         }
     }
 
     function handleQuickMenu() {
         soundController.playOptions();
+        processLauncher.requestHome();
         if (stage.activeSection === "quickmenu") {
             stage.activeSection = "tiles";
+            soundController.playHomeScreenMusic();
         } else {
             stage.activeSection = "quickmenu";
+        }
+    }
+
+    // Connect Process Launcher signals
+    Connections {
+        target: processLauncher
+        function onAppExited(name, exitCode) {
+            showNotification(name + " closed");
+            processLauncher.requestHome();
+            stage.activeSection = "tiles";
+            soundController.playHomeScreenMusic();
         }
     }
 

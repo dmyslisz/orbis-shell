@@ -664,6 +664,7 @@ Item {
         soundController.playConfirm();
         if (selectedIndex === 0) {
             processLauncher.terminateCurrentApp();
+            root.closeRequested();
         } else if (selectedIndex === 1) {
             if (rightSelectedIndex === 0) {
                 // Stepping volume up with Confirm if desired

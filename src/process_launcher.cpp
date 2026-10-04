@@ -72,9 +72,19 @@ void ProcessLauncher::requestHome()
 {
     qInfo() << "[ProcessLauncher] Home requested. Bringing Orbis Shell to front.";
     if (m_mainWindow) {
+        m_mainWindow->setFlag(Qt::WindowStaysOnTopHint, true);
         m_mainWindow->showFullScreen();
         m_mainWindow->raise();
         m_mainWindow->requestActivate();
+    }
+}
+
+void ProcessLauncher::lowerToApp()
+{
+    qInfo() << "[ProcessLauncher] Returning to running app:" << m_currentAppName;
+    if (m_mainWindow) {
+        m_mainWindow->setFlag(Qt::WindowStaysOnTopHint, false);
+        m_mainWindow->lower();
     }
 }
 
