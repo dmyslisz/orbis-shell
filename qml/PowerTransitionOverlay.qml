@@ -116,7 +116,9 @@ Item {
         root.actionType = type;
         root.isActive = true;
         root.opacity = 1.0;
-        soundController.playConfirm();
+        soundController.stopHomeScreenMusic();
+        soundController.stopLoginTheme();
+        soundController.playLogout();
         execTimer.restart();
     }
 }
