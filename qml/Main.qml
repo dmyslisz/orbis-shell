@@ -30,6 +30,7 @@ Window {
         height: 1080
         anchors.centerIn: parent
         scale: Math.min(appWindow.width / 1920, appWindow.height / 1080)
+        clip: true
 
         // Read tunables
         readonly property var tunables: configManager.tunables
@@ -169,6 +170,7 @@ Window {
         // ==========================================
         OptionsPanel {
             id: optionsPanel
+            anchors.fill: parent
             z: 50
             isOpen: stage.activeSection === "options"
             currentAppData: tileRow.currentItem()
@@ -198,6 +200,7 @@ Window {
         // ==========================================
         QuickMenu {
             id: quickMenu
+            anchors.fill: parent
             z: 50
             isOpen: stage.activeSection === "quickmenu"
             userName: stage.currentUserName
@@ -674,7 +677,9 @@ Window {
         } else if (stage.activeSection === "library") {
             if (libraryView.selectPrevious()) soundController.playTick();
         } else if (stage.activeSection === "quickmenu") {
-            quickMenu.adjustLeft();
+            quickMenu.handleLeft();
+        } else if (stage.activeSection === "settings") {
+            settingsView.handleLeft();
         }
     }
 
@@ -690,7 +695,9 @@ Window {
         } else if (stage.activeSection === "library") {
             if (libraryView.selectNext()) soundController.playTick();
         } else if (stage.activeSection === "quickmenu") {
-            quickMenu.adjustRight();
+            quickMenu.handleRight();
+        } else if (stage.activeSection === "settings") {
+            settingsView.handleRight();
         }
     }
 
@@ -702,11 +709,11 @@ Window {
             stage.activeSection = "tiles";
             soundController.playTick();
         } else if (stage.activeSection === "quickmenu") {
-            if (quickMenu.selectPrevious()) soundController.playTick();
+            quickMenu.handleUp();
         } else if (stage.activeSection === "options") {
             if (optionsPanel.selectPrevious()) soundController.playTick();
         } else if (stage.activeSection === "settings") {
-            if (settingsView.selectPrevious()) soundController.playTick();
+            settingsView.handleUp();
         } else if (stage.activeSection === "library") {
             if (libraryView.selectUp()) soundController.playTick();
         } else if (stage.activeSection === "trophies") {
@@ -726,11 +733,11 @@ Window {
             stage.activeSection = "deck";
             soundController.playTick();
         } else if (stage.activeSection === "quickmenu") {
-            if (quickMenu.selectNext()) soundController.playTick();
+            quickMenu.handleDown();
         } else if (stage.activeSection === "options") {
             if (optionsPanel.selectNext()) soundController.playTick();
         } else if (stage.activeSection === "settings") {
-            if (settingsView.selectNext()) soundController.playTick();
+            settingsView.handleDown();
         } else if (stage.activeSection === "library") {
             if (libraryView.selectDown()) soundController.playTick();
         } else if (stage.activeSection === "trophies") {
@@ -775,7 +782,9 @@ Window {
         } else if (stage.activeSection === "options") {
             optionsPanel.triggerCurrent();
         } else if (stage.activeSection === "quickmenu") {
-            quickMenu.triggerCurrent();
+            quickMenu.handleConfirm();
+        } else if (stage.activeSection === "settings") {
+            settingsView.handleConfirm();
         } else if (stage.activeSection === "library") {
             libraryView.triggerCurrent();
         } else if (stage.activeSection === "power") {
@@ -793,12 +802,21 @@ Window {
             stage.activeSection = "tiles";
             soundController.playBack();
         } else if (stage.activeSection === "options") {
-            stage.activeSection = "tiles";
-            soundController.playBack();
+            if (!optionsPanel.handleBack()) {
+                stage.activeSection = "tiles";
+                soundController.playBack();
+            }
         } else if (stage.activeSection === "quickmenu") {
-            stage.activeSection = "tiles";
-            soundController.playBack();
-        } else if (stage.activeSection === "settings" || stage.activeSection === "trophies" || stage.activeSection === "notifications" || stage.activeSection === "power") {
+            if (!quickMenu.handleBack()) {
+                stage.activeSection = "tiles";
+                soundController.playBack();
+            }
+        } else if (stage.activeSection === "settings") {
+            if (!settingsView.handleBack()) {
+                stage.activeSection = "topbar";
+                soundController.playBack();
+            }
+        } else if (stage.activeSection === "trophies" || stage.activeSection === "notifications" || stage.activeSection === "power") {
             stage.activeSection = "topbar";
             soundController.playBack();
         } else if (stage.activeSection === "library") {

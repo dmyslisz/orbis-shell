@@ -164,8 +164,15 @@ Item {
                     width: parent.width
                     height: 48
                     placeholderText: "Enter user name..."
+                    placeholderTextColor: "#80a0c8"
                     color: "#ffffff"
                     font.pixelSize: 18
+                    Keys.onReturnPressed: confirmNewUser()
+                    Keys.onEnterPressed: confirmNewUser()
+                    Keys.onEscapePressed: {
+                        isCreatingUser = false;
+                        soundController.playBack();
+                    }
                     background: Rectangle {
                         color: "#0a1628"
                         radius: 6
@@ -175,21 +182,61 @@ Item {
                 }
 
                 Row {
-                    spacing: 16
+                    spacing: 24
                     anchors.right: parent.right
 
-                    Button {
-                        text: "Cancel"
-                        onClicked: {
-                            isCreatingUser = false;
-                            soundController.playBack();
+                    Row {
+                        spacing: 8
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Image {
+                            width: 20
+                            height: 20
+                            source: "qrc:/assets/icons/buttons/PS4_Circle.png"
+                            fillMode: Image.PreserveAspectFit
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            text: "Cancel"
+                            color: "#a0b8d8"
+                            font.pixelSize: 16
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                isCreatingUser = false;
+                                soundController.playBack();
+                            }
                         }
                     }
 
-                    Button {
-                        text: "Confirm"
-                        highlighted: true
-                        onClicked: confirmNewUser()
+                    Row {
+                        spacing: 8
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Image {
+                            width: 20
+                            height: 20
+                            source: "qrc:/assets/icons/buttons/PS4_Cross.png"
+                            fillMode: Image.PreserveAspectFit
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            text: "Confirm"
+                            color: "#ffffff"
+                            font.pixelSize: 16
+                            font.weight: Font.Medium
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: confirmNewUser()
+                        }
                     }
                 }
             }

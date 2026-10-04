@@ -6,9 +6,11 @@ Item {
     anchors.fill: parent
 
     property bool isOpen: false
+
+    // 0 = Left Categories list, 1 = Right Detail pane
+    property int activePane: 0
     property int selectedCategory: 0
-    property int selectedSubItem: 0
-    property bool inDetailPane: false
+    property int rightSelectedIndex: 0
 
     signal closeRequested()
 
@@ -60,25 +62,22 @@ Item {
                 }
             }
 
-            // Back hint
+            // Action Hints
             Row {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 8
+                spacing: 24
 
-                Image {
-                    width: 22
-                    height: 22
-                    source: "qrc:/assets/icons/buttons/PS4_Circle.png"
-                    fillMode: Image.PreserveAspectFit
-                    anchors.verticalCenter: parent.verticalCenter
+                Row {
+                    spacing: 8
+                    Image { width: 20; height: 20; source: "qrc:/assets/icons/buttons/PS4_Cross.png"; fillMode: Image.PreserveAspectFit; anchors.verticalCenter: parent.verticalCenter }
+                    Text { text: "Select"; color: "#ffffff"; font.pixelSize: 16; anchors.verticalCenter: parent.verticalCenter }
                 }
 
-                Text {
-                    text: "Back"
-                    color: "#ffffff"
-                    font.pixelSize: 18
-                    anchors.verticalCenter: parent.verticalCenter
+                Row {
+                    spacing: 8
+                    Image { width: 20; height: 20; source: "qrc:/assets/icons/buttons/PS4_Circle.png"; fillMode: Image.PreserveAspectFit; anchors.verticalCenter: parent.verticalCenter }
+                    Text { text: "Back"; color: "#ffffff"; font.pixelSize: 16; anchors.verticalCenter: parent.verticalCenter }
                 }
             }
         }
@@ -91,7 +90,7 @@ Item {
             color: "#20ffffff"
         }
 
-        // Main Content: Left categories column + Right detail panel
+        // Main Content Area: Left Categories + Right Action Pane
         Item {
             anchors.top: header.bottom
             anchors.topMargin: 20
@@ -100,7 +99,7 @@ Item {
             anchors.right: parent.right
             anchors.margins: 60
 
-            // Left categories
+            // Left Categories Column
             ListView {
                 id: catList
                 anchors.top: parent.top
@@ -117,12 +116,15 @@ Item {
                     width: catList.width
                     height: 60
 
-                    readonly property bool isSelected: root.selectedCategory === index
+                    readonly property bool isCurrent: root.selectedCategory === index
+                    readonly property bool isFocused: isCurrent && root.activePane === 0
 
                     Rectangle {
                         anchors.fill: parent
                         radius: 4
-                        color: isSelected ? "#ffffff" : "transparent"
+                        color: isFocused ? "#ffffff" : (isCurrent ? "#204272" : "transparent")
+                        border.color: isFocused ? "#ffffff" : "transparent"
+                        border.width: isFocused ? 2 : 0
 
                         Row {
                             anchors.left: parent.left
@@ -136,14 +138,14 @@ Item {
                                 source: modelData.icon
                                 fillMode: Image.PreserveAspectFit
                                 anchors.verticalCenter: parent.verticalCenter
-                                opacity: isSelected ? 1.0 : 0.8
+                                opacity: isFocused ? 1.0 : 0.85
                             }
 
                             Text {
                                 text: modelData.name
-                                color: isSelected ? "#0a1d3d" : "#ffffff"
+                                color: isFocused ? "#0a1d3d" : "#ffffff"
                                 font.pixelSize: 20
-                                font.weight: isSelected ? Font.Medium : Font.Normal
+                                font.weight: isCurrent ? Font.Medium : Font.Normal
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                         }
@@ -153,6 +155,7 @@ Item {
                         anchors.fill: parent
                         onClicked: {
                             root.selectedCategory = index;
+                            root.activePane = 0;
                             soundController.playTick();
                         }
                     }
@@ -168,7 +171,7 @@ Item {
                 color: "#20ffffff"
             }
 
-            // Right detail pane
+            // Right Detail & Action Pane
             Item {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
@@ -210,45 +213,155 @@ Item {
                 // Category 1: Sound and Screen
                 Column {
                     visible: root.selectedCategory === 1
-                    spacing: 28
+                    spacing: 24
                     width: parent.width
 
                     Text { text: "Sound and Screen"; color: "#ffffff"; font.pixelSize: 24; font.weight: Font.DemiBold }
 
-                    Column {
-                        spacing: 12
-                        width: 500
+                    // Sub-item 0: Volume Controller Card
+                    Rectangle {
+                        width: 580
+                        height: 90
+                        radius: 6
+                        color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#142848"
+                        border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#30ffffff"
+                        border.width: 2
 
-                        Row {
-                            spacing: 16
-                            Text { text: "Master System Volume:"; color: "#a0b8d8"; font.pixelSize: 18 }
-                            Text { text: systemManager.systemVolume + "%"; color: "#ffffff"; font.pixelSize: 18; font.weight: Font.Bold }
-                        }
+                        Column {
+                            anchors.fill: parent
+                            anchors.margins: 16
+                            spacing: 12
 
-                        Slider {
-                            width: parent.width
-                            from: 0
-                            to: 100
-                            value: systemManager.systemVolume
-                            onMoved: systemManager.setSystemVolume(value)
+                            Row {
+                                width: parent.width
+                                Text {
+                                    text: "Master Volume"
+                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#ffffff"
+                                    font.pixelSize: 17
+                                    font.weight: Font.Medium
+                                }
+                                Text {
+                                    anchors.right: parent.right
+                                    text: systemManager.systemVolume + "%"
+                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#006FCD" : "#80c0ff"
+                                    font.pixelSize: 17
+                                    font.weight: Font.Bold
+                                }
+                            }
+
+                            Row {
+                                spacing: 14
+                                anchors.horizontalCenter: parent.horizontalCenter
+
+                                Text {
+                                    text: "◀"
+                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#a0c0e8"
+                                    font.pixelSize: 15
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                Rectangle {
+                                    width: 380
+                                    height: 12
+                                    radius: 6
+                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#d0e0f5" : "#0c1a32"
+                                    border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#90b8e8" : "#204070"
+                                    border.width: 1
+
+                                    Rectangle {
+                                        width: Math.max(4, parent.width * (systemManager.systemVolume / 100.0))
+                                        height: parent.height
+                                        radius: 6
+                                        color: "#006FCD"
+                                    }
+                                }
+
+                                Text {
+                                    text: "▶"
+                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#a0c0e8"
+                                    font.pixelSize: 15
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
                         }
                     }
 
-                    Row {
-                        spacing: 20
-                        Button {
-                            text: systemManager.isMuted ? "Unmute Master Audio" : "Mute Master Audio"
-                            highlighted: systemManager.isMuted
+                    // Sub-item 1: Mute Master Audio Card
+                    Rectangle {
+                        width: 580
+                        height: 60
+                        radius: 6
+                        color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#ffffff" : "#142848"
+                        border.color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#ffffff" : "#30ffffff"
+                        border.width: 2
+
+                        Row {
+                            anchors.fill: parent
+                            anchors.margins: 18
+                            spacing: 14
+
+                            Image {
+                                width: 24
+                                height: 24
+                                source: systemManager.isMuted ? "qrc:/assets/icons/sound_mute.svg" : "qrc:/assets/icons/sound.svg"
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                text: systemManager.isMuted ? "Unmute Master Audio" : "Mute Master Audio"
+                                color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#0a1d3d" : "#ffffff"
+                                font.pixelSize: 18
+                                font.weight: Font.Medium
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
                             onClicked: {
+                                root.activePane = 1;
+                                root.rightSelectedIndex = 1;
                                 systemManager.setIsMuted(!systemManager.isMuted);
                                 soundController.playConfirm();
                             }
                         }
+                    }
 
-                        Button {
-                            text: soundController.bgmEnabled ? "Disable Home Screen Music" : "Enable Home Screen Music"
-                            highlighted: !soundController.bgmEnabled
+                    // Sub-item 2: BGM Card
+                    Rectangle {
+                        width: 580
+                        height: 60
+                        radius: 6
+                        color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#ffffff" : "#142848"
+                        border.color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#ffffff" : "#30ffffff"
+                        border.width: 2
+
+                        Row {
+                            anchors.fill: parent
+                            anchors.margins: 18
+                            spacing: 14
+
+                            Image {
+                                width: 24
+                                height: 24
+                                source: "qrc:/assets/icons/sound.svg"
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                text: soundController.bgmEnabled ? "Disable Home Screen Music (BGM)" : "Enable Home Screen Music (BGM)"
+                                color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#0a1d3d" : "#ffffff"
+                                font.pixelSize: 18
+                                font.weight: Font.Medium
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
                             onClicked: {
+                                root.activePane = 1;
+                                root.rightSelectedIndex = 2;
                                 soundController.setBgmEnabled(!soundController.bgmEnabled);
                                 soundController.playConfirm();
                             }
@@ -366,17 +479,43 @@ Item {
 
                     Text { text: "Power Save Settings"; color: "#ffffff"; font.pixelSize: 24; font.weight: Font.DemiBold }
 
-                    Text {
-                        text: "Configure sleep intervals and rest mode behavior."
-                        color: "#a0c0e8"
-                        font.pixelSize: 16
-                    }
+                    Rectangle {
+                        width: 580
+                        height: 60
+                        radius: 6
+                        color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#142848"
+                        border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#30ffffff"
+                        border.width: 2
 
-                    Button {
-                        text: "Enter Rest Mode Now"
-                        onClicked: {
-                            systemManager.enterRestMode();
-                            soundController.playConfirm();
+                        Row {
+                            anchors.fill: parent
+                            anchors.margins: 18
+                            spacing: 14
+
+                            Image {
+                                width: 24
+                                height: 24
+                                source: "qrc:/assets/icons/rest_mode.svg"
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                text: "Enter Rest Mode Now (Suspend)"
+                                color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#ffffff"
+                                font.pixelSize: 18
+                                font.weight: Font.Medium
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                root.activePane = 1;
+                                root.rightSelectedIndex = 0;
+                                systemManager.enterRestMode();
+                                soundController.playConfirm();
+                            }
                         }
                     }
                 }
@@ -384,19 +523,126 @@ Item {
         }
     }
 
-    function selectPrevious() {
-        if (selectedCategory > 0) {
-            selectedCategory--;
+    // ==========================================
+    // CONSOLE NAVIGATION HANDLERS
+    // ==========================================
+    function handleUp() {
+        if (activePane === 0) {
+            if (selectedCategory > 0) {
+                selectedCategory--;
+                rightSelectedIndex = 0;
+                soundController.playTick();
+                return true;
+            }
+        } else {
+            if (rightSelectedIndex > 0) {
+                rightSelectedIndex--;
+                soundController.playTick();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function handleDown() {
+        if (activePane === 0) {
+            if (selectedCategory < categories.length - 1) {
+                selectedCategory++;
+                rightSelectedIndex = 0;
+                soundController.playTick();
+                return true;
+            }
+        } else {
+            var maxItems = getMaxRightItems();
+            if (rightSelectedIndex < maxItems - 1) {
+                rightSelectedIndex++;
+                soundController.playTick();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function handleLeft() {
+        if (activePane === 1) {
+            // If on Volume slider in Sound category, decrease volume
+            if (selectedCategory === 1 && rightSelectedIndex === 0) {
+                systemManager.setSystemVolume(Math.max(0, systemManager.systemVolume - 5));
+                soundController.playTick();
+                return true;
+            }
+            // Otherwise, return focus to Left category list
+            activePane = 0;
+            soundController.playTick();
             return true;
         }
         return false;
     }
 
-    function selectNext() {
-        if (selectedCategory < categories.length - 1) {
-            selectedCategory++;
+    function handleRight() {
+        if (activePane === 0) {
+            // Move into right pane if category has interactive items
+            var maxItems = getMaxRightItems();
+            if (maxItems > 0) {
+                activePane = 1;
+                rightSelectedIndex = 0;
+                soundController.playTick();
+                return true;
+            }
+        } else if (activePane === 1) {
+            // If on Volume slider, increase volume
+            if (selectedCategory === 1 && rightSelectedIndex === 0) {
+                systemManager.setSystemVolume(Math.min(100, systemManager.systemVolume + 5));
+                soundController.playTick();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function handleConfirm() {
+        if (activePane === 0) {
+            var maxItems = getMaxRightItems();
+            if (maxItems > 0) {
+                activePane = 1;
+                rightSelectedIndex = 0;
+                soundController.playConfirm();
+                return true;
+            }
+        } else {
+            triggerRightAction();
             return true;
         }
         return false;
+    }
+
+    function handleBack() {
+        if (activePane === 1) {
+            activePane = 0;
+            soundController.playBack();
+            return true; // handled internally
+        }
+        return false; // let parent close settings
+    }
+
+    function getMaxRightItems() {
+        if (selectedCategory === 1) return 3; // Volume, Mute, BGM
+        if (selectedCategory === 5) return 1; // Rest Mode
+        return 0;
+    }
+
+    function triggerRightAction() {
+        soundController.playConfirm();
+        if (selectedCategory === 1) {
+            if (rightSelectedIndex === 1) {
+                systemManager.setIsMuted(!systemManager.isMuted);
+            } else if (rightSelectedIndex === 2) {
+                soundController.setBgmEnabled(!soundController.bgmEnabled);
+            }
+        } else if (selectedCategory === 5) {
+            if (rightSelectedIndex === 0) {
+                systemManager.enterRestMode();
+            }
+        }
     }
 }

@@ -3,9 +3,8 @@ import QtQuick.Controls
 
 Item {
     id: root
-    width: parent.width
-    height: 1080
-    visible: root.isOpen || panel.x < parent.width
+    anchors.fill: parent
+    visible: root.isOpen || panel.x < root.width
 
     property bool isOpen: false
     property var currentAppData: null
@@ -198,17 +197,44 @@ Item {
 
                 Item { width: 1; height: 10 }
 
-                Button {
-                    text: "OK (Back)"
+                Row {
                     anchors.right: parent.right
-                    highlighted: true
-                    onClicked: {
-                        root.showingInfoDialog = false;
-                        soundController.playBack();
+                    spacing: 8
+
+                    Image {
+                        width: 22
+                        height: 22
+                        source: "qrc:/assets/icons/buttons/PS4_Circle.png"
+                        fillMode: Image.PreserveAspectFit
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    Text {
+                        text: "Back"
+                        color: "#ffffff"
+                        font.pixelSize: 16
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            root.showingInfoDialog = false;
+                            soundController.playBack();
+                        }
                     }
                 }
             }
         }
+    }
+
+    function handleBack() {
+        if (root.showingInfoDialog) {
+            root.showingInfoDialog = false;
+            soundController.playBack();
+            return true;
+        }
+        return false;
     }
 
     function selectPrevious() {
