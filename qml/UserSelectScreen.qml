@@ -17,7 +17,6 @@ Item {
     Column {
         anchors.centerIn: parent
         spacing: 48
-        horizontalAlignment: Text.AlignHCenter
 
         Text {
             text: "Who is using this controller?"
@@ -48,7 +47,6 @@ Item {
                     Column {
                         anchors.centerIn: parent
                         spacing: 16
-                        horizontalAlignment: Text.AlignHCenter
 
                         // Avatar card with glowing selection border
                         Rectangle {

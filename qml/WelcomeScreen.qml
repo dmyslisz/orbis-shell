@@ -10,7 +10,6 @@ Item {
     Column {
         anchors.centerIn: parent
         spacing: 36
-        horizontalAlignment: Text.AlignHCenter
 
         // PS Controller silhouette graphic
         Item {

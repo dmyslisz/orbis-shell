@@ -233,16 +233,17 @@ Item {
                         Column {
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
-                            horizontalAlignment: Text.AlignRight
                             spacing: 4
 
                             Text {
+                                anchors.right: parent.right
                                 text: modelData.unlocked ? modelData.unlockedDate : "Locked"
                                 color: isSelected ? "#0a1d3d" : (modelData.unlocked ? "#ffffff" : "#6080a0")
                                 font.pixelSize: 14
                             }
 
                             Text {
+                                anchors.right: parent.right
                                 text: modelData.rarity ? modelData.rarity : "Ultra Rare"
                                 color: isSelected ? "#2a4d7d" : "#7090b0"
                                 font.pixelSize: 13

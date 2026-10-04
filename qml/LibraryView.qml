@@ -253,7 +253,6 @@ Item {
                     Column {
                         anchors.centerIn: parent
                         spacing: 12
-                        horizontalAlignment: Text.AlignHCenter
 
                         Rectangle {
                             width: 180
