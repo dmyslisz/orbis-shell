@@ -27,6 +27,8 @@ SoundController::SoundController(const QString &baseAssetDir, QObject *parent)
 
     qInfo() << "[SoundController] Audio assets directory:" << m_assetsDir;
     initSounds();
+
+    connect(&m_bgmLoopTimer, &QTimer::timeout, this, &SoundController::checkBgmLoop);
 }
 
 SoundController::~SoundController()
@@ -260,12 +262,26 @@ void SoundController::playHomeScreenMusic()
     m_homeScreenMusicPlaying = true;
     if (!m_enabled || !m_bgmEnabled) return;
     playSdlSample(m_sdlHomeScreenMusic, static_cast<float>(m_masterVolume * m_bgmVolume), true);
+    m_bgmLoopTimer.start(1500);
 }
 
 void SoundController::stopHomeScreenMusic()
 {
     m_homeScreenMusicPlaying = false;
+    m_bgmLoopTimer.stop();
     stopSdlSample(m_sdlHomeScreenMusic);
+}
+
+void SoundController::checkBgmLoop()
+{
+    if (!m_homeScreenMusicPlaying || !m_enabled || !m_bgmEnabled) return;
+    if (m_sdlHomeScreenMusic.stream && m_sdlHomeScreenMusic.data) {
+        int queued = SDL_GetAudioStreamQueued(m_sdlHomeScreenMusic.stream);
+        if (queued < static_cast<int>(m_sdlHomeScreenMusic.length / 2)) {
+            SDL_PutAudioStreamData(m_sdlHomeScreenMusic.stream, m_sdlHomeScreenMusic.data, m_sdlHomeScreenMusic.length);
+            SDL_FlushAudioStream(m_sdlHomeScreenMusic.stream);
+        }
+    }
 }
 
 void SoundController::playLogin()
@@ -408,15 +424,26 @@ void SoundController::playHomeScreenMusic()
     m_homeScreenMusicPlaying = true;
     if (m_enabled && m_bgmEnabled && m_bgmPlayer) {
         m_bgmAudioOutput->setVolume(static_cast<float>(m_masterVolume * m_bgmVolume));
+        m_bgmPlayer->setLoops(QMediaPlayer::Infinite);
         m_bgmPlayer->play();
+        m_bgmLoopTimer.start(2000);
     }
 }
 
 void SoundController::stopHomeScreenMusic()
 {
     m_homeScreenMusicPlaying = false;
+    m_bgmLoopTimer.stop();
     if (m_bgmPlayer) {
         m_bgmPlayer->stop();
+    }
+}
+
+void SoundController::checkBgmLoop()
+{
+    if (!m_homeScreenMusicPlaying || !m_enabled || !m_bgmEnabled) return;
+    if (m_bgmPlayer && m_bgmPlayer->playbackState() != QMediaPlayer::PlayingState) {
+        m_bgmPlayer->play();
     }
 }
 

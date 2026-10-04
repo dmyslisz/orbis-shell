@@ -41,7 +41,7 @@ Window {
         property string activeSection: "welcome"
 
         // Active user profile state
-        property string currentUserName: configManager.activeUser ? configManager.activeUser : "PlayStation Player"
+        property string currentUserName: configManager.activeUser ? configManager.activeUser : "User 1"
         property string currentUserAvatar: "qrc:/assets/avatars/avatar_luchador.svg"
 
         Component.onCompleted: {
@@ -215,9 +215,6 @@ Window {
                 if (actionId === "power") {
                     stage.activeSection = "power";
                     soundController.playConfirm();
-                } else if (actionId === "friends") {
-                    showNotification("Friends: 4 Online");
-                    soundController.playConfirm();
                 }
             }
         }
@@ -250,15 +247,6 @@ Window {
             }
         }
 
-        TrophiesView {
-            id: trophiesView
-            z: 100
-            isOpen: stage.activeSection === "trophies"
-            onCloseRequested: {
-                stage.activeSection = "topbar";
-                soundController.playBack();
-            }
-        }
 
         NotificationsView {
             id: notifView
@@ -283,6 +271,13 @@ Window {
                 soundController.stopHomeScreenMusic();
                 soundController.playBootChime();
             }
+        }
+
+        // ==========================================
+        // APP LAUNCH ZOOM & SPLASH OVERLAY
+        // ==========================================
+        AppLaunchSplash {
+            id: launchSplash
         }
 
         // ==========================================
@@ -403,68 +398,7 @@ Window {
             }
         }
 
-        // ==========================================
-        // 11. TROPHY UNLOCKED NOTIFICATION TOAST
-        // ==========================================
-        Rectangle {
-            id: trophyToast
-            x: 0
-            y: 110
-            width: 320
-            height: 74
-            radius: 4
-            color: "#e60a1e3c"
-            border.color: "#fbc02d"
-            border.width: 2
-            z: 350
-            opacity: 0.0
 
-            Behavior on opacity {
-                NumberAnimation { duration: 200 }
-            }
-
-            Timer {
-                id: trophyToastTimer
-                interval: 4200
-                onTriggered: trophyToast.opacity = 0.0
-            }
-
-            Row {
-                anchors.fill: parent
-                anchors.margins: 14
-                spacing: 16
-
-                Image {
-                    width: 44
-                    height: 44
-                    source: "qrc:/assets/icons/trophy_gold.svg"
-                    fillMode: Image.PreserveAspectFit
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Column {
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 4
-
-                    Text {
-                        text: "You've earned a trophy!"
-                        color: "#fbc02d"
-                        font.pixelSize: 14
-                        font.weight: Font.Bold
-                    }
-
-                    Text {
-                        id: trophyToastTitle
-                        text: "Trophy Name"
-                        color: "#ffffff"
-                        font.pixelSize: 15
-                        font.weight: Font.Medium
-                        elide: Text.ElideRight
-                        width: 230
-                    }
-                }
-            }
-        }
 
         // Subtle toast banner for standard notifications
         Rectangle {
@@ -621,17 +555,6 @@ Window {
         }
     }
 
-    // Connect trophy unlocked notification
-    Connections {
-        target: configManager
-        function onTrophyUnlocked(trophy) {
-            soundController.playTrophy();
-            trophyToastTitle.text = trophy.title;
-            trophyToast.opacity = 1.0;
-            trophyToastTimer.restart();
-        }
-    }
-
     function showNotification(msg) {
         soundController.playNotification();
         toastText.text = msg;
@@ -654,6 +577,7 @@ Window {
 
     function launchAppDirect(item) {
         soundController.playConfirm();
+        launchSplash.startLaunch(item);
         if (item.exec && item.exec.length > 0) {
             var started = processLauncher.launch(item.name, item.exec);
             if (!started) {
@@ -716,8 +640,6 @@ Window {
             settingsView.handleUp();
         } else if (stage.activeSection === "library") {
             if (libraryView.selectUp()) soundController.playTick();
-        } else if (stage.activeSection === "trophies") {
-            if (trophiesView.selectPrevious()) soundController.playTick();
         } else if (stage.activeSection === "notifications") {
             if (notifView.selectPrevious()) soundController.playTick();
         } else if (stage.activeSection === "power") {
@@ -740,8 +662,6 @@ Window {
             settingsView.handleDown();
         } else if (stage.activeSection === "library") {
             if (libraryView.selectDown()) soundController.playTick();
-        } else if (stage.activeSection === "trophies") {
-            if (trophiesView.selectNext()) soundController.playTick();
         } else if (stage.activeSection === "notifications") {
             if (notifView.selectNext()) soundController.playTick();
         } else if (stage.activeSection === "power") {
@@ -765,18 +685,10 @@ Window {
                 soundController.playConfirm();
                 if (item.id === "settings") {
                     stage.activeSection = "settings";
-                } else if (item.id === "trophies") {
-                    stage.activeSection = "trophies";
                 } else if (item.id === "notifications") {
                     stage.activeSection = "notifications";
                 } else if (item.id === "power") {
                     stage.activeSection = "power";
-                } else if (item.id === "profile") {
-                    stage.activeSection = "users";
-                    soundController.stopHomeScreenMusic();
-                    soundController.playBootChime();
-                } else {
-                    showNotification("Opening " + item.name);
                 }
             }
         } else if (stage.activeSection === "options") {
@@ -816,7 +728,7 @@ Window {
                 stage.activeSection = "topbar";
                 soundController.playBack();
             }
-        } else if (stage.activeSection === "trophies" || stage.activeSection === "notifications" || stage.activeSection === "power") {
+        } else if (stage.activeSection === "notifications" || stage.activeSection === "power") {
             stage.activeSection = "topbar";
             soundController.playBack();
         } else if (stage.activeSection === "library") {

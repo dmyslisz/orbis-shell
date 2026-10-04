@@ -21,8 +21,8 @@ Item {
     // When isRowFocused: 210
     // When TopBar is focused: 820 (slides down)
     // When Overview Deck is active: -180 (slides up)
-    y: isDeckActive ? -180 : (isRowFocused ? 210 : 820)
-    opacity: isDeckActive ? 0.3 : 1.0
+    y: isDeckActive ? -180 : (isRowFocused ? 280 : 690)
+    opacity: isDeckActive ? 0.3 : (isRowFocused ? 1.0 : 0.65)
 
     Behavior on y {
         NumberAnimation { duration: 220; easing.type: Easing.OutQuad }

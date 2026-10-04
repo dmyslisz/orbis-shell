@@ -13,10 +13,10 @@ Item {
 
     readonly property var powerOptions: [
         { id: "rest", name: "Enter Rest Mode", desc: "Suspend power to system. Wake up instantly with controller.", icon: "qrc:/assets/icons/rest_mode.svg" },
-        { id: "poweroff", name: "Turn Off PS4", desc: "Completely power off the system and close all running applications.", icon: "qrc:/assets/icons/power.svg" },
-        { id: "reboot", name: "Restart PS4", desc: "Reboot the system and restart the Orbis OS desktop session.", icon: "qrc:/assets/icons/restart.svg" },
+        { id: "poweroff", name: "Turn Off System", desc: "Completely power off the system and close all running applications.", icon: "qrc:/assets/icons/power.svg" },
+        { id: "reboot", name: "Restart System", desc: "Reboot the system and restart the Orbis OS desktop session.", icon: "qrc:/assets/icons/restart.svg" },
         { id: "switch_user", name: "Switch User", desc: "Log in with another user profile without logging out.", icon: "qrc:/assets/icons/profile.svg" },
-        { id: "logout", name: "Log Out of PS4", desc: "Log out the current user profile and return to welcome screen.", icon: "qrc:/assets/icons/power.svg" }
+        { id: "logout", name: "Log Out", desc: "Log out the current user profile and return to welcome screen.", icon: "qrc:/assets/icons/power.svg" }
     ]
 
     visible: isOpen

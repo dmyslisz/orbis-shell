@@ -226,7 +226,7 @@ Item {
                     }
                 }
 
-                // Card 3: Trophies Summary
+                // Card 3: Technical Details
                 Rectangle {
                     width: 480
                     height: 320
@@ -241,7 +241,7 @@ Item {
                         spacing: 20
 
                         Text {
-                            text: "Trophies"
+                            text: "Technical Details"
                             color: "#ffffff"
                             font.pixelSize: 20
                             font.weight: Font.DemiBold
@@ -250,41 +250,33 @@ Item {
                         Row {
                             spacing: 16
                             Image {
-                                width: 44
-                                height: 44
-                                source: "qrc:/assets/icons/trophy_platinum.svg"
+                                width: 36
+                                height: 36
+                                source: "qrc:/assets/icons/sysinfo.svg"
                                 fillMode: Image.PreserveAspectFit
                             }
                             Column {
                                 spacing: 4
                                 anchors.verticalCenter: parent.verticalCenter
                                 Text {
-                                    text: "Progress: 68%"
+                                    text: "Session: Native Wayland"
                                     color: "#ffffff"
                                     font.pixelSize: 16
                                     font.weight: Font.Medium
                                 }
                                 Text {
-                                    text: "1 Platinum, 4 Gold, 12 Silver"
+                                    text: "Gamepad: SDL3 Gamepad Subsystem"
                                     color: "#a0c0e8"
                                     font.pixelSize: 14
                                 }
                             }
                         }
 
-                        // Progress bar
-                        Rectangle {
-                            width: parent.width
-                            height: 8
-                            radius: 4
-                            color: "#182a46"
-
-                            Rectangle {
-                                width: parent.width * 0.68
-                                height: parent.height
-                                radius: 4
-                                color: "#fbc02d"
-                            }
+                        Text {
+                            text: "Execution Mode: Direct Desktop Session\nAudio Output: PipeWire Sink\nDisplay Mode: 1080p 60 FPS"
+                            color: "#80a8d8"
+                            font.pixelSize: 14
+                            lineHeight: 1.4
                         }
                     }
                 }

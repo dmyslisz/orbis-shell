@@ -18,9 +18,9 @@ Item {
     readonly property real focusedHeight: 390
     readonly property real extraShift: (focusedWidth - baseSize) + 36
 
-    // Shift neighbor tiles to the right
+    // Shift neighbor tiles to the right only when the row is actively focused
     readonly property real targetShiftX: {
-        if (itemIndex > focusedIndex) {
+        if (root.isRowFocused && itemIndex > focusedIndex) {
             return root.extraShift;
         } else {
             return 0.0;

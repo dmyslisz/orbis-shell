@@ -7,7 +7,7 @@ Item {
     visible: root.isOpen || panel.x > -panel.width
 
     property bool isOpen: false
-    property string userName: "Player 1"
+    property string userName: "User 1"
     property string userAvatar: "qrc:/assets/avatars/avatar_luchador.svg"
 
     // 0 = Left Menu items, 1 = Right Detail items
@@ -20,9 +20,7 @@ Item {
 
     readonly property var menuItems: [
         { id: "close_app", name: "Close Application", icon: "qrc:/assets/icons/close_app.svg" },
-        { id: "sound_devices", name: "Sound/Devices", icon: "qrc:/assets/icons/sound_devices.svg" },
-        { id: "music", name: "Music (BGM)", icon: "qrc:/assets/icons/sound.svg" },
-        { id: "friends", name: "Friends", icon: "qrc:/assets/icons/quickmenu_friends.png" },
+        { id: "sound_devices", name: "Sound / Devices", icon: "qrc:/assets/icons/sound_devices.svg" },
         { id: "power", name: "Power", icon: "qrc:/assets/icons/power.svg" }
     ]
 
@@ -77,7 +75,7 @@ Item {
                 anchors.topMargin: 56
                 spacing: 20
 
-                // User Info Header
+                // User Info Header (Clean, no online or PlayStation branding)
                 Row {
                     spacing: 14
                     anchors.left: parent.left
@@ -108,8 +106,8 @@ Item {
                         }
 
                         Text {
-                            text: "Online"
-                            color: "#4caf50"
+                            text: "Active Profile"
+                            color: "#80a8d8"
                             font.pixelSize: 13
                         }
                     }
@@ -148,9 +146,9 @@ Item {
                                 Behavior on color { ColorAnimation { duration: 120 } }
 
                                 Row {
-                                    anchors.left: parent.left
+                                    anchors.fill: parent
                                     anchors.leftMargin: 16
-                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.rightMargin: 16
                                     spacing: 14
 
                                     Image {
@@ -159,24 +157,25 @@ Item {
                                         source: modelData.icon
                                         fillMode: Image.PreserveAspectFit
                                         anchors.verticalCenter: parent.verticalCenter
+                                        // Strictly monochrome white icon
+                                        opacity: isFocused ? 0.95 : 0.75
                                     }
 
                                     Text {
                                         text: modelData.name
                                         color: isFocused ? "#0a1d3d" : "#ffffff"
                                         font.pixelSize: 17
-                                        font.weight: isCurrent ? Font.Medium : Font.Normal
+                                        font.weight: isFocused ? Font.DemiBold : Font.Normal
                                         anchors.verticalCenter: parent.verticalCenter
                                     }
                                 }
-                            }
 
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    root.selectedIndex = index;
-                                    root.activePane = 0;
-                                    soundController.playTick();
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        root.selectedIndex = index;
+                                        root.activePane = 0;
+                                    }
                                 }
                             }
                         }
@@ -185,16 +184,26 @@ Item {
             }
         }
 
+        // Vertical divider
+        Rectangle {
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: leftCol.right
+            width: 1
+            color: "#25ffffff"
+        }
+
         // ==========================================
-        // RIGHT COLUMN: CONSOLE ACTION ITEMS
+        // RIGHT COLUMN: CONSOLE CARDS & STEPPERS
         // ==========================================
         Item {
+            id: rightPane
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: leftCol.right
             anchors.right: parent.right
-            anchors.margins: 36
-            anchors.topMargin: 70
+            anchors.margins: 28
+            anchors.topMargin: 56
 
             // 1. Close Application Pane
             Column {
@@ -210,16 +219,11 @@ Item {
                 }
 
                 Text {
-                    text: processLauncher.isAppRunning 
-                          ? "Currently running: " + processLauncher.currentAppName 
-                          : "No application is currently running."
+                    text: processLauncher.isAppRunning ? ("Active: " + processLauncher.currentAppName) : "No application is currently running."
                     color: "#a0c0e8"
-                    font.pixelSize: 15
-                    wrapMode: Text.WordWrap
-                    width: parent.width
+                    font.pixelSize: 16
                 }
 
-                // Console Action Card
                 Rectangle {
                     visible: processLauncher.isAppRunning
                     width: parent.width - 20
@@ -235,9 +239,9 @@ Item {
                         spacing: 12
 
                         Image {
-                            width: 20
-                            height: 20
-                            source: "qrc:/assets/icons/buttons/PS4_Cross.png"
+                            width: 22
+                            height: 22
+                            source: "qrc:/assets/icons/close_app.svg"
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -276,7 +280,7 @@ Item {
                 // Sub-item 0: Volume Controller Card
                 Rectangle {
                     width: parent.width - 20
-                    height: 86
+                    height: 96
                     radius: 6
                     color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#142848"
                     border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#30ffffff"
@@ -285,7 +289,7 @@ Item {
                     Column {
                         anchors.fill: parent
                         anchors.margins: 14
-                        spacing: 10
+                        spacing: 12
 
                         Row {
                             width: parent.width
@@ -306,37 +310,77 @@ Item {
 
                         // Console Progress Bar with Steppers
                         Row {
-                            spacing: 10
+                            spacing: 12
                             anchors.horizontalCenter: parent.horizontalCenter
 
-                            Text {
-                                text: "◀"
-                                color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#a0c0e8"
-                                font.pixelSize: 14
+                            // Decrement button
+                            Rectangle {
+                                width: 28
+                                height: 28
+                                radius: 4
+                                color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#d0e4ff" : "#1a355a"
                                 anchors.verticalCenter: parent.verticalCenter
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "◀"
+                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#ffffff"
+                                    font.pixelSize: 13
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        root.activePane = 1;
+                                        root.rightSelectedIndex = 0;
+                                        systemManager.setSystemVolume(Math.max(0, systemManager.systemVolume - 5));
+                                        soundController.playTick();
+                                    }
+                                }
                             }
 
+                            // Stepper bar
                             Rectangle {
-                                width: 260
-                                height: 12
-                                radius: 6
-                                color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#d0e0f5" : "#0c1a32"
-                                border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#90b8e8" : "#204070"
+                                width: 240
+                                height: 14
+                                radius: 7
+                                color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#c5dcf7" : "#0c1a32"
+                                border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#70a8e8" : "#204070"
                                 border.width: 1
+                                anchors.verticalCenter: parent.verticalCenter
 
                                 Rectangle {
-                                    width: Math.max(4, parent.width * (systemManager.systemVolume / 100.0))
+                                    width: Math.max(6, parent.width * (systemManager.systemVolume / 100.0))
                                     height: parent.height
-                                    radius: 6
+                                    radius: 7
                                     color: "#006FCD"
                                 }
                             }
 
-                            Text {
-                                text: "▶"
-                                color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#a0c0e8"
-                                font.pixelSize: 14
+                            // Increment button
+                            Rectangle {
+                                width: 28
+                                height: 28
+                                radius: 4
+                                color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#d0e4ff" : "#1a355a"
                                 anchors.verticalCenter: parent.verticalCenter
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "▶"
+                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#ffffff"
+                                    font.pixelSize: 13
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        root.activePane = 1;
+                                        root.rightSelectedIndex = 0;
+                                        systemManager.setSystemVolume(Math.min(100, systemManager.systemVolume + 5));
+                                        soundController.playTick();
+                                    }
+                                }
                             }
                         }
                     }
@@ -359,7 +403,7 @@ Item {
                         Image {
                             width: 22
                             height: 22
-                            source: systemManager.isMuted ? "qrc:/assets/icons/sound_mute.svg" : "qrc:/assets/icons/sound.svg"
+                            source: "qrc:/assets/icons/sound_mute.svg"
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -370,11 +414,22 @@ Item {
                             font.weight: Font.Medium
                             anchors.verticalCenter: parent.verticalCenter
                         }
+
+                        Rectangle {
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 14
+                            height: 14
+                            radius: 7
+                            color: systemManager.isMuted ? "#ef5350" : "#4caf50"
+                        }
                     }
 
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
+                            root.activePane = 1;
+                            root.rightSelectedIndex = 1;
                             systemManager.setIsMuted(!systemManager.isMuted);
                             soundController.playConfirm();
                         }
@@ -382,20 +437,20 @@ Item {
                 }
             }
 
-            // 3. Music (BGM) Pane
+            // 3. Power Pane
             Column {
                 visible: root.selectedIndex === 2
-                spacing: 22
+                spacing: 16
                 width: parent.width
 
                 Text {
-                    text: "Background Music (BGM)"
+                    text: "Power"
                     color: "#ffffff"
                     font.pixelSize: 22
                     font.weight: Font.DemiBold
                 }
 
-                // Sub-item 0: Toggle BGM Card
+                // Power option 0: Rest Mode
                 Rectangle {
                     width: parent.width - 20
                     height: 56
@@ -410,14 +465,14 @@ Item {
                         spacing: 12
 
                         Image {
-                            width: 20
-                            height: 20
-                            source: "qrc:/assets/icons/buttons/PS4_Cross.png"
+                            width: 22
+                            height: 22
+                            source: "qrc:/assets/icons/rest_mode.svg"
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         Text {
-                            text: soundController.bgmEnabled ? "Mute Home Screen Music" : "Enable Home Screen Music"
+                            text: "Enter Rest Mode"
                             color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#ffffff"
                             font.pixelSize: 17
                             font.weight: Font.Medium
@@ -428,129 +483,112 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            soundController.setBgmEnabled(!soundController.bgmEnabled);
+                            systemManager.enterRestMode();
+                            soundController.playConfirm();
+                        }
+                    }
+                }
+
+                // Power option 1: Turn Off
+                Rectangle {
+                    width: parent.width - 20
+                    height: 56
+                    radius: 4
+                    color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#ffffff" : "#142848"
+                    border.color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#ffffff" : "#30ffffff"
+                    border.width: 2
+
+                    Row {
+                        anchors.fill: parent
+                        anchors.margins: 16
+                        spacing: 12
+
+                        Image {
+                            width: 22
+                            height: 22
+                            source: "qrc:/assets/icons/power.svg"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            text: "Turn Off System"
+                            color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#0a1d3d" : "#ffffff"
+                            font.pixelSize: 17
+                            font.weight: Font.Medium
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            systemManager.turnOff();
+                            soundController.playConfirm();
+                        }
+                    }
+                }
+
+                // Power option 2: Restart
+                Rectangle {
+                    width: parent.width - 20
+                    height: 56
+                    radius: 4
+                    color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#ffffff" : "#142848"
+                    border.color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#ffffff" : "#30ffffff"
+                    border.width: 2
+
+                    Row {
+                        anchors.fill: parent
+                        anchors.margins: 16
+                        spacing: 12
+
+                        Image {
+                            width: 22
+                            height: 22
+                            source: "qrc:/assets/icons/restart.svg"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            text: "Restart System"
+                            color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#0a1d3d" : "#ffffff"
+                            font.pixelSize: 17
+                            font.weight: Font.Medium
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            systemManager.restart();
                             soundController.playConfirm();
                         }
                     }
                 }
             }
+        }
 
-            // 4. Friends Pane
-            Column {
-                visible: root.selectedIndex === 3
-                spacing: 18
-                width: parent.width
+        // Bottom Action hints
+        Row {
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 24
+            anchors.left: parent.left
+            anchors.leftMargin: 28
+            spacing: 20
 
-                Text {
-                    text: "Friends Online (4)"
-                    color: "#ffffff"
-                    font.pixelSize: 22
-                    font.weight: Font.DemiBold
-                }
-
-                Repeater {
-                    model: [
-                        { name: "Alex", status: "Playing Steam Game", color: "#4caf50" },
-                        { name: "Chris", status: "Online", color: "#4caf50" },
-                        { name: "Sam", status: "In Voice Party", color: "#2196f3" },
-                        { name: "Morgan", status: "Away", color: "#ffa726" }
-                    ]
-
-                    Rectangle {
-                        required property var modelData
-                        width: parent.width - 20
-                        height: 52
-                        radius: 4
-                        color: "#10223e"
-                        border.color: "#20ffffff"
-                        border.width: 1
-
-                        Row {
-                            anchors.fill: parent
-                            anchors.margins: 14
-                            spacing: 12
-
-                            Rectangle {
-                                width: 10
-                                height: 10
-                                radius: 5
-                                color: modelData.color
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Text {
-                                text: modelData.name + " (" + modelData.status + ")"
-                                color: "#ffffff"
-                                font.pixelSize: 16
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-                    }
-                }
+            Row {
+                spacing: 6
+                anchors.verticalCenter: parent.verticalCenter
+                Image { width: 20; height: 20; source: "qrc:/assets/icons/buttons/PS4_Cross.png"; fillMode: Image.PreserveAspectFit; anchors.verticalCenter: parent.verticalCenter }
+                Text { text: "Select"; color: "#ffffff"; font.pixelSize: 15; anchors.verticalCenter: parent.verticalCenter }
             }
 
-            // 5. Power Pane
-            Column {
-                visible: root.selectedIndex === 4
-                spacing: 14
-                width: parent.width
-
-                Text {
-                    text: "Power Options"
-                    color: "#ffffff"
-                    font.pixelSize: 22
-                    font.weight: Font.DemiBold
-                }
-
-                Repeater {
-                    model: [
-                        { id: "rest", title: "Enter Rest Mode (Suspend)", icon: "qrc:/assets/icons/rest_mode.svg" },
-                        { id: "poweroff", title: "Turn Off System (Power Off)", icon: "qrc:/assets/icons/power.svg" },
-                        { id: "reboot", title: "Restart System (Reboot)", icon: "qrc:/assets/icons/restart.svg" }
-                    ]
-
-                    Rectangle {
-                        required property int index
-                        required property var modelData
-                        width: parent.width - 20
-                        height: 56
-                        radius: 4
-                        color: (root.activePane === 1 && root.rightSelectedIndex === index) ? "#ffffff" : "#142848"
-                        border.color: (root.activePane === 1 && root.rightSelectedIndex === index) ? "#ffffff" : "#30ffffff"
-                        border.width: 2
-
-                        Row {
-                            anchors.fill: parent
-                            anchors.margins: 16
-                            spacing: 14
-
-                            Image {
-                                width: 24
-                                height: 24
-                                source: modelData.icon
-                                fillMode: Image.PreserveAspectFit
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Text {
-                                text: modelData.title
-                                color: (root.activePane === 1 && root.rightSelectedIndex === index) ? "#0a1d3d" : "#ffffff"
-                                font.pixelSize: 17
-                                font.weight: Font.Medium
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                root.activePane = 1;
-                                root.rightSelectedIndex = index;
-                                root.triggerRightAction();
-                            }
-                        }
-                    }
-                }
+            Row {
+                spacing: 6
+                anchors.verticalCenter: parent.verticalCenter
+                Image { width: 20; height: 20; source: "qrc:/assets/icons/buttons/PS4_Circle.png"; fillMode: Image.PreserveAspectFit; anchors.verticalCenter: parent.verticalCenter }
+                Text { text: "Back"; color: "#ffffff"; font.pixelSize: 15; anchors.verticalCenter: parent.verticalCenter }
             }
         }
     }
@@ -596,8 +634,15 @@ Item {
     }
 
     function handleLeft() {
-        if (activePane === 1) {
-            // If on Volume slider, decrease volume
+        if (activePane === 0) {
+            // If on Sound/Devices in left pane, decrease volume directly
+            if (selectedIndex === 1) {
+                systemManager.setSystemVolume(Math.max(0, systemManager.systemVolume - 5));
+                soundController.playTick();
+                return true;
+            }
+        } else if (activePane === 1) {
+            // If on Volume stepper, decrease volume
             if (selectedIndex === 1 && rightSelectedIndex === 0) {
                 systemManager.setSystemVolume(Math.max(0, systemManager.systemVolume - 5));
                 soundController.playTick();
@@ -619,7 +664,7 @@ Item {
             soundController.playTick();
             return true;
         } else if (activePane === 1) {
-            // If on Volume slider, increase volume
+            // If on Volume stepper, increase volume
             if (selectedIndex === 1 && rightSelectedIndex === 0) {
                 systemManager.setSystemVolume(Math.min(100, systemManager.systemVolume + 5));
                 soundController.playTick();
@@ -631,7 +676,6 @@ Item {
 
     function handleConfirm() {
         if (activePane === 0) {
-            // Move into right pane
             activePane = 1;
             rightSelectedIndex = 0;
             soundController.playConfirm();
@@ -646,17 +690,15 @@ Item {
         if (activePane === 1) {
             activePane = 0;
             soundController.playBack();
-            return true; // handled internally
+            return true;
         }
-        return false; // let parent close menu
+        return false;
     }
 
     function getMaxRightItems() {
         if (selectedIndex === 0) return processLauncher.isAppRunning ? 1 : 0;
         if (selectedIndex === 1) return 2; // 0 = Volume, 1 = Mute
-        if (selectedIndex === 2) return 1; // 0 = Toggle BGM
-        if (selectedIndex === 3) return 0;
-        if (selectedIndex === 4) return 3; // 0 = Rest, 1 = Off, 2 = Reboot
+        if (selectedIndex === 2) return 3; // 0 = Rest, 1 = Off, 2 = Reboot
         return 0;
     }
 
@@ -665,12 +707,13 @@ Item {
         if (selectedIndex === 0) {
             processLauncher.terminateCurrentApp();
         } else if (selectedIndex === 1) {
-            if (rightSelectedIndex === 1) {
+            if (rightSelectedIndex === 0) {
+                // Stepping volume up with Confirm if desired
+                systemManager.setSystemVolume(Math.min(100, systemManager.systemVolume + 5));
+            } else if (rightSelectedIndex === 1) {
                 systemManager.setIsMuted(!systemManager.isMuted);
             }
         } else if (selectedIndex === 2) {
-            soundController.setBgmEnabled(!soundController.bgmEnabled);
-        } else if (selectedIndex === 4) {
             if (rightSelectedIndex === 0) {
                 systemManager.enterRestMode();
             } else if (rightSelectedIndex === 1) {

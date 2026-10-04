@@ -29,10 +29,15 @@ void SystemManager::setSystemVolume(int vol)
         emit systemVolumeChanged();
 
 #ifndef Q_OS_WIN
-        // Try wpctl (Fedora PipeWire)
+        QString percent = QString("%1%").arg(vol);
         float normalized = vol / 100.0f;
-        QString cmd = QString("wpctl set-volume @DEFAULT_AUDIO_SINK@ %1").arg(normalized);
-        QProcess::execute("/bin/sh", {"-c", cmd});
+        // PipeWire wpctl
+        QProcess::startDetached("wpctl", {"set-volume", "@DEFAULT_AUDIO_SINK@", percent});
+        QProcess::startDetached("wpctl", {"set-volume", "@DEFAULT_AUDIO_SINK@", QString::number(normalized, 'f', 2)});
+        // PulseAudio / PipeWire-Pulse fallback
+        QProcess::startDetached("pactl", {"set-sink-volume", "@DEFAULT_SINK@", percent});
+        // ALSA fallback
+        QProcess::startDetached("amixer", {"-q", "set", "Master", percent});
 #endif
     }
 }
@@ -44,8 +49,9 @@ void SystemManager::setIsMuted(bool muted)
         emit systemVolumeChanged();
 
 #ifndef Q_OS_WIN
-        QString cmd = QString("wpctl set-mute @DEFAULT_AUDIO_SINK@ %1").arg(muted ? "1" : "0");
-        QProcess::execute("/bin/sh", {"-c", cmd});
+        QProcess::startDetached("wpctl", {"set-mute", "@DEFAULT_AUDIO_SINK@", muted ? "1" : "0"});
+        QProcess::startDetached("pactl", {"set-sink-mute", "@DEFAULT_SINK@", muted ? "1" : "0"});
+        QProcess::startDetached("amixer", {"-q", "set", "Master", muted ? "mute" : "unmute"});
 #endif
     }
 }

@@ -83,8 +83,18 @@ Item {
                             Image {
                                 anchors.fill: parent
                                 anchors.margins: 4
-                                source: isNewUserCard ? "qrc:/assets/icons/ps_plus.svg" : (userData.avatar ? userData.avatar : "qrc:/assets/avatars/avatar_luchador.svg")
+                                visible: !isNewUserCard
+                                source: (userData && userData.avatar) ? userData.avatar : "qrc:/assets/avatars/avatar_luchador.svg"
                                 fillMode: Image.PreserveAspectFit
+                            }
+
+                            Text {
+                                visible: isNewUserCard
+                                anchors.centerIn: parent
+                                text: "+"
+                                color: "#ffffff"
+                                font.pixelSize: 52
+                                font.weight: Font.Light
                             }
                         }
 
@@ -95,34 +105,6 @@ Item {
                             font.pixelSize: 18
                             font.weight: isSelected ? Font.Medium : Font.Normal
                             anchors.horizontalCenter: parent.horizontalCenter
-                        }
-
-                        // Trophy level pill
-                        Rectangle {
-                            visible: !isNewUserCard && userData && userData.trophyLevel
-                            width: 60
-                            height: 22
-                            radius: 11
-                            color: "#204278"
-                            border.color: "#5080c0"
-                            border.width: 1
-                            anchors.horizontalCenter: parent.horizontalCenter
-
-                            Row {
-                                anchors.centerIn: parent
-                                spacing: 4
-                                Text {
-                                    text: "★"
-                                    color: "#fbc02d"
-                                    font.pixelSize: 12
-                                }
-                                Text {
-                                    text: userData && userData.trophyLevel ? userData.trophyLevel : "1"
-                                    color: "#ffffff"
-                                    font.pixelSize: 12
-                                    font.weight: Font.Bold
-                                }
-                            }
                         }
                     }
                 }
@@ -297,9 +279,6 @@ Item {
             id: "user_" + Date.now(),
             name: name,
             avatar: "qrc:/assets/avatars/avatar_fox.svg",
-            trophyLevel: 1,
-            trophies: { platinum: 0, gold: 0, silver: 0, bronze: 0 },
-            plusMember: false,
             isCurrent: true
         };
         configManager.saveUser(newUser);

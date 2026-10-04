@@ -7,10 +7,10 @@ Item {
 
     property bool isOpen: false
 
-    // 0 = Left Categories list, 1 = Right Detail pane
-    property int activePane: 0
+    // 0 = Categories List, 1 = Category Full-Screen Sub-Page
+    property int currentLevel: 0
     property int selectedCategory: 0
-    property int rightSelectedIndex: 0
+    property int subSelectedIndex: 0
 
     signal closeRequested()
 
@@ -33,30 +33,32 @@ Item {
         anchors.fill: parent
         color: "#08142a"
 
-        // Top Header
+        // ==========================================
+        // TOP HEADER
+        // ==========================================
         Item {
             id: header
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
             height: 100
-            anchors.margins: 60
+            anchors.margins: 70
 
             Row {
-                spacing: 20
+                spacing: 16
                 anchors.verticalCenter: parent.verticalCenter
 
                 Image {
-                    width: 36
-                    height: 36
+                    width: 32
+                    height: 32
                     source: "qrc:/assets/icons/settings.svg"
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
                 Text {
-                    text: "Settings"
+                    text: root.currentLevel === 0 ? "Settings" : ("Settings > " + root.categories[root.selectedCategory].name)
                     color: "#ffffff"
-                    font.pixelSize: 32
+                    font.pixelSize: 30
                     font.weight: Font.DemiBold
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -90,47 +92,48 @@ Item {
             color: "#20ffffff"
         }
 
-        // Main Content Area: Left Categories + Right Action Pane
+        // ==========================================
+        // LEVEL 0: FULL-SCREEN CATEGORIES LIST
+        // ==========================================
         Item {
+            id: level0Container
             anchors.top: header.bottom
             anchors.topMargin: 20
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.margins: 60
+            anchors.margins: 70
+            visible: root.currentLevel === 0
 
-            // Left Categories Column
             ListView {
                 id: catList
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                width: 440
+                anchors.fill: parent
                 clip: true
-                spacing: 6
+                spacing: 8
                 model: root.categories
 
                 delegate: Item {
                     required property int index
                     required property var modelData
                     width: catList.width
-                    height: 60
+                    height: 64
 
-                    readonly property bool isCurrent: root.selectedCategory === index
-                    readonly property bool isFocused: isCurrent && root.activePane === 0
+                    readonly property bool isCurrent: root.selectedCategory === index && root.currentLevel === 0
 
                     Rectangle {
                         anchors.fill: parent
-                        radius: 4
-                        color: isFocused ? "#ffffff" : (isCurrent ? "#204272" : "transparent")
-                        border.color: isFocused ? "#ffffff" : "transparent"
-                        border.width: isFocused ? 2 : 0
+                        radius: 6
+                        color: isCurrent ? "#ffffff" : "#0e1e3a"
+                        border.color: isCurrent ? "#ffffff" : "#20ffffff"
+                        border.width: isCurrent ? 2 : 1
+
+                        Behavior on color { ColorAnimation { duration: 120 } }
 
                         Row {
-                            anchors.left: parent.left
-                            anchors.leftMargin: 20
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 16
+                            anchors.fill: parent
+                            anchors.leftMargin: 24
+                            anchors.rightMargin: 24
+                            spacing: 20
 
                             Image {
                                 width: 26
@@ -138,14 +141,181 @@ Item {
                                 source: modelData.icon
                                 fillMode: Image.PreserveAspectFit
                                 anchors.verticalCenter: parent.verticalCenter
-                                opacity: isFocused ? 1.0 : 0.85
+                                opacity: isCurrent ? 0.95 : 0.75
                             }
 
                             Text {
                                 text: modelData.name
-                                color: isFocused ? "#0a1d3d" : "#ffffff"
+                                color: isCurrent ? "#0a1d3d" : "#ffffff"
                                 font.pixelSize: 20
-                                font.weight: isCurrent ? Font.Medium : Font.Normal
+                                font.weight: isCurrent ? Font.DemiBold : Font.Normal
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+
+                        // Right chevron arrow
+                        Text {
+                            anchors.right: parent.right
+                            anchors.rightMargin: 24
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "›"
+                            color: isCurrent ? "#0a1d3d" : "#7090b8"
+                            font.pixelSize: 28
+                            font.weight: Font.Light
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                root.selectedCategory = index;
+                                root.subSelectedIndex = 0;
+                                root.currentLevel = 1;
+                                soundController.playConfirm();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // ==========================================
+        // LEVEL 1: FULL-SCREEN CATEGORY DETAIL PAGE
+        // ==========================================
+        Item {
+            id: level1Container
+            anchors.top: header.bottom
+            anchors.topMargin: 30
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.margins: 70
+            visible: root.currentLevel === 1
+
+            // Category 0: System Information
+            Column {
+                visible: root.selectedCategory === 0
+                spacing: 20
+                width: parent.width
+
+                Repeater {
+                    model: [
+                        { label: "Operating System", value: (root.sysInfo.osName ? root.sysInfo.osName : "Fedora Linux 44") },
+                        { label: "Kernel Version", value: (root.sysInfo.kernelVersion ? root.sysInfo.kernelVersion : "Linux 6.x") },
+                        { label: "Architecture", value: (root.sysInfo.architecture ? root.sysInfo.architecture : "x86_64") },
+                        { label: "Desktop Session", value: "Orbis OS Shell (Native Wayland / X11)" },
+                        { label: "System Memory", value: (root.sysInfo.totalRam ? root.sysInfo.totalRam : "Standard Unified Memory") },
+                        { label: "Display Mode", value: "1920x1080 @ 60 Hz (Hardware Accelerated Sapphire Wave)" }
+                    ]
+
+                    Rectangle {
+                        required property var modelData
+                        width: parent.width
+                        height: 58
+                        radius: 4
+                        color: "#0e1e3a"
+                        border.color: "#20ffffff"
+                        border.width: 1
+
+                        Row {
+                            anchors.fill: parent
+                            anchors.margins: 20
+                            Text {
+                                text: modelData.label
+                                color: "#80a8d8"
+                                font.pixelSize: 18
+                                font.weight: Font.Medium
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Text {
+                                anchors.right: parent.right
+                                text: modelData.value
+                                color: "#ffffff"
+                                font.pixelSize: 18
+                                font.weight: Font.Medium
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Category 1: Sound and Screen
+            Column {
+                visible: root.selectedCategory === 1
+                spacing: 16
+                width: parent.width
+
+                // 0. Master Volume Stepper Card
+                Rectangle {
+                    width: parent.width
+                    height: 84
+                    radius: 6
+                    color: root.subSelectedIndex === 0 ? "#ffffff" : "#0e1e3a"
+                    border.color: root.subSelectedIndex === 0 ? "#ffffff" : "#20ffffff"
+                    border.width: root.subSelectedIndex === 0 ? 2 : 1
+
+                    Row {
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 24
+
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 4
+                            Text {
+                                text: "Master Audio Volume"
+                                color: root.subSelectedIndex === 0 ? "#0a1d3d" : "#ffffff"
+                                font.pixelSize: 19
+                                font.weight: Font.DemiBold
+                            }
+                            Text {
+                                text: "Adjust output volume via PipeWire sink"
+                                color: root.subSelectedIndex === 0 ? "#305080" : "#80a8d8"
+                                font.pixelSize: 14
+                            }
+                        }
+
+                        Row {
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 16
+
+                            Text {
+                                text: "◀"
+                                color: root.subSelectedIndex === 0 ? "#0a1d3d" : "#a0c0e8"
+                                font.pixelSize: 16
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Rectangle {
+                                width: 280
+                                height: 14
+                                radius: 7
+                                color: root.subSelectedIndex === 0 ? "#d0e4ff" : "#0a1628"
+                                border.color: root.subSelectedIndex === 0 ? "#80b0f0" : "#204070"
+                                border.width: 1
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                Rectangle {
+                                    width: Math.max(6, parent.width * (systemManager.systemVolume / 100.0))
+                                    height: parent.height
+                                    radius: 7
+                                    color: "#006FCD"
+                                }
+                            }
+
+                            Text {
+                                text: "▶"
+                                color: root.subSelectedIndex === 0 ? "#0a1d3d" : "#a0c0e8"
+                                font.pixelSize: 16
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            Text {
+                                text: systemManager.systemVolume + "%"
+                                color: root.subSelectedIndex === 0 ? "#0a1d3d" : "#ffffff"
+                                font.pixelSize: 18
+                                font.weight: Font.Bold
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                         }
@@ -154,367 +324,334 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            root.selectedCategory = index;
-                            root.activePane = 0;
-                            soundController.playTick();
+                            root.subSelectedIndex = 0;
                         }
                     }
                 }
-            }
 
-            Rectangle {
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.left: catList.right
-                anchors.leftMargin: 40
-                width: 1
-                color: "#20ffffff"
-            }
-
-            // Right Detail & Action Pane
-            Item {
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.left: catList.right
-                anchors.leftMargin: 80
-                anchors.right: parent.right
-
-                // Category 0: System Information
-                Column {
-                    visible: root.selectedCategory === 0
-                    spacing: 24
+                // 1. Mute Audio Toggle Card
+                Rectangle {
                     width: parent.width
+                    height: 72
+                    radius: 6
+                    color: root.subSelectedIndex === 1 ? "#ffffff" : "#0e1e3a"
+                    border.color: root.subSelectedIndex === 1 ? "#ffffff" : "#20ffffff"
+                    border.width: root.subSelectedIndex === 1 ? 2 : 1
 
-                    Text { text: "System Information"; color: "#ffffff"; font.pixelSize: 24; font.weight: Font.DemiBold }
-
-                    Grid {
-                        columns: 2
-                        rowSpacing: 18
-                        columnSpacing: 24
-                        width: parent.width
-
-                        Text { text: "System OS:"; color: "#a0b8d8"; font.pixelSize: 18; width: 200 }
-                        Text { text: root.sysInfo.os !== undefined ? root.sysInfo.os : "Fedora Linux 44"; color: "#ffffff"; font.pixelSize: 18 }
-
-                        Text { text: "Kernel Version:"; color: "#a0b8d8"; font.pixelSize: 18 }
-                        Text { text: root.sysInfo.kernel !== undefined ? root.sysInfo.kernel : "Linux 6.x"; color: "#ffffff"; font.pixelSize: 18 }
-
-                        Text { text: "Processor (CPU):"; color: "#a0b8d8"; font.pixelSize: 18 }
-                        Text { text: root.sysInfo.cpu !== undefined ? root.sysInfo.cpu : "x86_64"; color: "#ffffff"; font.pixelSize: 18 }
-
-                        Text { text: "System Memory:"; color: "#a0b8d8"; font.pixelSize: 18 }
-                        Text { text: (root.sysInfo.ramUsed !== undefined ? root.sysInfo.ramUsed : "4.0 GB") + " / " + (root.sysInfo.ramTotal !== undefined ? root.sysInfo.ramTotal : "16.0 GB"); color: "#ffffff"; font.pixelSize: 18 }
-
-                        Text { text: "Desktop Shell:"; color: "#a0b8d8"; font.pixelSize: 18 }
-                        Text { text: "Orbis OS Shell v1.0.0 (Wayland / X11)"; color: "#ffffff"; font.pixelSize: 18 }
-                    }
-                }
-
-                // Category 1: Sound and Screen
-                Column {
-                    visible: root.selectedCategory === 1
-                    spacing: 24
-                    width: parent.width
-
-                    Text { text: "Sound and Screen"; color: "#ffffff"; font.pixelSize: 24; font.weight: Font.DemiBold }
-
-                    // Sub-item 0: Volume Controller Card
-                    Rectangle {
-                        width: 580
-                        height: 90
-                        radius: 6
-                        color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#142848"
-                        border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#30ffffff"
-                        border.width: 2
+                    Row {
+                        anchors.fill: parent
+                        anchors.margins: 20
 
                         Column {
-                            anchors.fill: parent
-                            anchors.margins: 16
-                            spacing: 12
-
-                            Row {
-                                width: parent.width
-                                Text {
-                                    text: "Master Volume"
-                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#ffffff"
-                                    font.pixelSize: 17
-                                    font.weight: Font.Medium
-                                }
-                                Text {
-                                    anchors.right: parent.right
-                                    text: systemManager.systemVolume + "%"
-                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#006FCD" : "#80c0ff"
-                                    font.pixelSize: 17
-                                    font.weight: Font.Bold
-                                }
-                            }
-
-                            Row {
-                                spacing: 14
-                                anchors.horizontalCenter: parent.horizontalCenter
-
-                                Text {
-                                    text: "◀"
-                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#a0c0e8"
-                                    font.pixelSize: 15
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-
-                                Rectangle {
-                                    width: 380
-                                    height: 12
-                                    radius: 6
-                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#d0e0f5" : "#0c1a32"
-                                    border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#90b8e8" : "#204070"
-                                    border.width: 1
-
-                                    Rectangle {
-                                        width: Math.max(4, parent.width * (systemManager.systemVolume / 100.0))
-                                        height: parent.height
-                                        radius: 6
-                                        color: "#006FCD"
-                                    }
-                                }
-
-                                Text {
-                                    text: "▶"
-                                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#a0c0e8"
-                                    font.pixelSize: 15
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                            }
-                        }
-                    }
-
-                    // Sub-item 1: Mute Master Audio Card
-                    Rectangle {
-                        width: 580
-                        height: 60
-                        radius: 6
-                        color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#ffffff" : "#142848"
-                        border.color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#ffffff" : "#30ffffff"
-                        border.width: 2
-
-                        Row {
-                            anchors.fill: parent
-                            anchors.margins: 18
-                            spacing: 14
-
-                            Image {
-                                width: 24
-                                height: 24
-                                source: systemManager.isMuted ? "qrc:/assets/icons/sound_mute.svg" : "qrc:/assets/icons/sound.svg"
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 4
                             Text {
-                                text: systemManager.isMuted ? "Unmute Master Audio" : "Mute Master Audio"
-                                color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#0a1d3d" : "#ffffff"
-                                font.pixelSize: 18
-                                font.weight: Font.Medium
-                                anchors.verticalCenter: parent.verticalCenter
+                                text: "Mute System Audio"
+                                color: root.subSelectedIndex === 1 ? "#0a1d3d" : "#ffffff"
+                                font.pixelSize: 19
+                                font.weight: Font.DemiBold
                             }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                root.activePane = 1;
-                                root.rightSelectedIndex = 1;
-                                systemManager.setIsMuted(!systemManager.isMuted);
-                                soundController.playConfirm();
-                            }
-                        }
-                    }
-
-                    // Sub-item 2: BGM Card
-                    Rectangle {
-                        width: 580
-                        height: 60
-                        radius: 6
-                        color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#ffffff" : "#142848"
-                        border.color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#ffffff" : "#30ffffff"
-                        border.width: 2
-
-                        Row {
-                            anchors.fill: parent
-                            anchors.margins: 18
-                            spacing: 14
-
-                            Image {
-                                width: 24
-                                height: 24
-                                source: "qrc:/assets/icons/sound.svg"
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
                             Text {
-                                text: soundController.bgmEnabled ? "Disable Home Screen Music (BGM)" : "Enable Home Screen Music (BGM)"
-                                color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#0a1d3d" : "#ffffff"
-                                font.pixelSize: 18
-                                font.weight: Font.Medium
-                                anchors.verticalCenter: parent.verticalCenter
+                                text: systemManager.isMuted ? "All sound output currently muted" : "Audio is active"
+                                color: root.subSelectedIndex === 1 ? "#305080" : "#80a8d8"
+                                font.pixelSize: 14
                             }
                         }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                root.activePane = 1;
-                                root.rightSelectedIndex = 2;
-                                soundController.setBgmEnabled(!soundController.bgmEnabled);
-                                soundController.playConfirm();
-                            }
-                        }
-                    }
-                }
-
-                // Category 2: Storage
-                Column {
-                    visible: root.selectedCategory === 2
-                    spacing: 24
-                    width: parent.width
-
-                    Text { text: "Storage"; color: "#ffffff"; font.pixelSize: 24; font.weight: Font.DemiBold }
-
-                    Text {
-                        text: "System Storage (" + (root.sysInfo.storageFree !== undefined ? root.sysInfo.storageFree : "256 GB") + " free of " + (root.sysInfo.storageTotal !== undefined ? root.sysInfo.storageTotal : "512 GB") + ")"
-                        color: "#a0b8d8"
-                        font.pixelSize: 18
-                    }
-
-                    Rectangle {
-                        width: 600
-                        height: 20
-                        radius: 10
-                        color: "#182c4c"
 
                         Rectangle {
-                            width: 380
-                            height: parent.height
-                            radius: 10
-                            color: "#006FCD"
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 80
+                            height: 32
+                            radius: 16
+                            color: systemManager.isMuted ? "#ef5350" : (root.subSelectedIndex === 1 ? "#1a3560" : "#204278")
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: systemManager.isMuted ? "MUTED" : "ON"
+                                color: "#ffffff"
+                                font.pixelSize: 13
+                                font.weight: Font.Bold
+                            }
                         }
                     }
 
-                    Row {
-                        spacing: 24
-                        Row {
-                            spacing: 8
-                            Rectangle { width: 14; height: 14; radius: 3; color: "#006FCD"; anchors.verticalCenter: parent.verticalCenter }
-                            Text { text: "Applications & Games"; color: "#ffffff"; font.pixelSize: 16 }
-                        }
-                        Row {
-                            spacing: 8
-                            Rectangle { width: 14; height: 14; radius: 3; color: "#182c4c"; anchors.verticalCenter: parent.verticalCenter }
-                            Text { text: "Free Space"; color: "#a0b8d8"; font.pixelSize: 16 }
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            root.subSelectedIndex = 1;
+                            systemManager.setIsMuted(!systemManager.isMuted);
+                            soundController.playConfirm();
                         }
                     }
                 }
 
-                // Category 3: Network
-                Column {
-                    visible: root.selectedCategory === 3
-                    spacing: 24
+                // 2. Looping Home Screen Music (BGM) Card
+                Rectangle {
                     width: parent.width
+                    height: 72
+                    radius: 6
+                    color: root.subSelectedIndex === 2 ? "#ffffff" : "#0e1e3a"
+                    border.color: root.subSelectedIndex === 2 ? "#ffffff" : "#20ffffff"
+                    border.width: root.subSelectedIndex === 2 ? 2 : 1
 
-                    Text { text: "Network"; color: "#ffffff"; font.pixelSize: 24; font.weight: Font.DemiBold }
+                    Row {
+                        anchors.fill: parent
+                        anchors.margins: 20
 
-                    Grid {
-                        columns: 2
-                        rowSpacing: 18
-                        columnSpacing: 24
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 4
+                            Text {
+                                text: "Home Screen Music (BGM)"
+                                color: root.subSelectedIndex === 2 ? "#0a1d3d" : "#ffffff"
+                                font.pixelSize: 19
+                                font.weight: Font.DemiBold
+                            }
+                            Text {
+                                text: "Continuous seamless ambient audio loop in home menu"
+                                color: root.subSelectedIndex === 2 ? "#305080" : "#80a8d8"
+                                font.pixelSize: 14
+                            }
+                        }
+
+                        Rectangle {
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 90
+                            height: 32
+                            radius: 16
+                            color: soundController.bgmEnabled ? "#4caf50" : "#607d8b"
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: soundController.bgmEnabled ? "ENABLED" : "OFF"
+                                color: "#ffffff"
+                                font.pixelSize: 13
+                                font.weight: Font.Bold
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            root.subSelectedIndex = 2;
+                            soundController.setBgmEnabled(!soundController.bgmEnabled);
+                            soundController.playConfirm();
+                        }
+                    }
+                }
+            }
+
+            // Category 2: Storage
+            Column {
+                visible: root.selectedCategory === 2
+                spacing: 24
+                width: parent.width
+
+                Rectangle {
+                    width: parent.width
+                    height: 140
+                    radius: 8
+                    color: "#0e1e3a"
+                    border.color: "#20ffffff"
+                    border.width: 1
+
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 24
+                        spacing: 16
+
+                        Row {
+                            width: parent.width
+                            Text {
+                                text: "System Drive Storage"
+                                color: "#ffffff"
+                                font.pixelSize: 20
+                                font.weight: Font.DemiBold
+                            }
+                            Text {
+                                anchors.right: parent.right
+                                text: (root.sysInfo.diskFree ? root.sysInfo.diskFree : "Available") + " free of " + (root.sysInfo.diskTotal ? root.sysInfo.diskTotal : "Total")
+                                color: "#a0c0e8"
+                                font.pixelSize: 16
+                            }
+                        }
+
+                        Rectangle {
+                            width: parent.width
+                            height: 18
+                            radius: 9
+                            color: "#0a1628"
+                            border.color: "#204070"
+                            border.width: 1
+
+                            Rectangle {
+                                width: parent.width * 0.42
+                                height: parent.height
+                                radius: 9
+                                color: "#006FCD"
+                            }
+                        }
+
+                        Row {
+                            spacing: 24
+                            Row {
+                                spacing: 8
+                                Rectangle { width: 12; height: 12; radius: 3; color: "#006FCD"; anchors.verticalCenter: parent.verticalCenter }
+                                Text { text: "Applications & Games"; color: "#80a8d8"; font.pixelSize: 14; anchors.verticalCenter: parent.verticalCenter }
+                            }
+                            Row {
+                                spacing: 8
+                                Rectangle { width: 12; height: 12; radius: 3; color: "#0a1628"; border.color: "#204070"; border.width: 1; anchors.verticalCenter: parent.verticalCenter }
+                                Text { text: "Free Space"; color: "#80a8d8"; font.pixelSize: 14; anchors.verticalCenter: parent.verticalCenter }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Category 3: Network
+            Column {
+                visible: root.selectedCategory === 3
+                spacing: 16
+                width: parent.width
+
+                Repeater {
+                    model: [
+                        { label: "Connection Status", value: systemManager.isOnline ? "Connected to Network" : "Offline" },
+                        { label: "Connection Type", value: systemManager.networkType },
+                        { label: "IP Address", value: systemManager.ipAddress.length > 0 ? systemManager.ipAddress : "192.168.1.100" },
+                        { label: "Subsystem", value: "Linux NetworkManager / systemd-networkd" }
+                    ]
+
+                    Rectangle {
+                        required property var modelData
                         width: parent.width
+                        height: 58
+                        radius: 4
+                        color: "#0e1e3a"
+                        border.color: "#20ffffff"
+                        border.width: 1
 
-                        Text { text: "Status:"; color: "#a0b8d8"; font.pixelSize: 18; width: 180 }
-                        Text { text: systemManager.isOnline ? "Connected to the Internet" : "Disconnected"; color: systemManager.isOnline ? "#4caf50" : "#ef5350"; font.pixelSize: 18; font.weight: Font.Medium }
-
-                        Text { text: "Connection Method:"; color: "#a0b8d8"; font.pixelSize: 18 }
-                        Text { text: systemManager.networkType; color: "#ffffff"; font.pixelSize: 18 }
-
-                        Text { text: "PlayStation Network:"; color: "#a0b8d8"; font.pixelSize: 18 }
-                        Text { text: "Signed In (Local Orbis Emulation)"; color: "#ffffff"; font.pixelSize: 18 }
+                        Row {
+                            anchors.fill: parent
+                            anchors.margins: 20
+                            Text {
+                                text: modelData.label
+                                color: "#80a8d8"
+                                font.pixelSize: 18
+                                font.weight: Font.Medium
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Text {
+                                anchors.right: parent.right
+                                text: modelData.value
+                                color: "#ffffff"
+                                font.pixelSize: 18
+                                font.weight: Font.Medium
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                        }
                     }
                 }
+            }
 
-                // Category 4: Devices & Controllers
-                Column {
-                    visible: root.selectedCategory === 4
-                    spacing: 24
+            // Category 4: Devices & Controllers
+            Column {
+                visible: root.selectedCategory === 4
+                spacing: 24
+                width: parent.width
+
+                Rectangle {
                     width: parent.width
-
-                    Text { text: "Controllers & Input Devices"; color: "#ffffff"; font.pixelSize: 24; font.weight: Font.DemiBold }
+                    height: 120
+                    radius: 8
+                    color: "#0e1e3a"
+                    border.color: "#20ffffff"
+                    border.width: 1
 
                     Row {
-                        spacing: 20
+                        anchors.fill: parent
+                        anchors.margins: 28
+                        spacing: 24
+
                         Image {
                             width: 64
                             height: 64
                             source: "qrc:/assets/icons/ControllerWhite.png"
                             fillMode: Image.PreserveAspectFit
+                            anchors.verticalCenter: parent.verticalCenter
                         }
+
                         Column {
                             spacing: 6
                             anchors.verticalCenter: parent.verticalCenter
                             Text {
-                                text: gamepadManager.gamepadConnected ? gamepadManager.gamepadName : "Keyboard & Mouse (Standard Controller)"
+                                text: gamepadManager.gamepadConnected ? gamepadManager.gamepadName : "Keyboard & Standard Controller"
                                 color: "#ffffff"
-                                font.pixelSize: 20
+                                font.pixelSize: 22
                                 font.weight: Font.Medium
                             }
                             Text {
-                                text: gamepadManager.gamepadConnected ? "Connected via SDL3 Gamepad" : "Connected via Linux evdev"
-                                color: "#a0c0e8"
+                                text: gamepadManager.gamepadConnected ? "Active SDL3 Gamepad Subsystem" : "Standard Input (evdev / X11 / Wayland)"
+                                color: "#80a8d8"
                                 font.pixelSize: 16
                             }
                         }
                     }
                 }
+            }
 
-                // Category 5: Power Save
-                Column {
-                    visible: root.selectedCategory === 5
-                    spacing: 24
-                    width: parent.width
+            // Category 5: Power Save Settings
+            Column {
+                visible: root.selectedCategory === 5
+                spacing: 16
+                width: parent.width
 
-                    Text { text: "Power Save Settings"; color: "#ffffff"; font.pixelSize: 24; font.weight: Font.DemiBold }
+                Repeater {
+                    model: [
+                        { id: "rest", title: "Enter Rest Mode Now (Suspend)", desc: "Low power suspend; resume anytime instantly" },
+                        { id: "poweroff", title: "Power Off System", desc: "Completely turn off the computer" },
+                        { id: "restart", title: "Restart System", desc: "Reboot computer and relaunch session" }
+                    ]
 
                     Rectangle {
-                        width: 580
-                        height: 60
+                        required property int index
+                        required property var modelData
+                        width: parent.width
+                        height: 72
                         radius: 6
-                        color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#142848"
-                        border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#30ffffff"
-                        border.width: 2
+                        color: root.subSelectedIndex === index ? "#ffffff" : "#0e1e3a"
+                        border.color: root.subSelectedIndex === index ? "#ffffff" : "#20ffffff"
+                        border.width: root.subSelectedIndex === index ? 2 : 1
 
                         Row {
                             anchors.fill: parent
-                            anchors.margins: 18
-                            spacing: 14
-
-                            Image {
-                                width: 24
-                                height: 24
-                                source: "qrc:/assets/icons/rest_mode.svg"
+                            anchors.margins: 20
+                            Column {
                                 anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            Text {
-                                text: "Enter Rest Mode Now (Suspend)"
-                                color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#ffffff"
-                                font.pixelSize: 18
-                                font.weight: Font.Medium
-                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 4
+                                Text {
+                                    text: modelData.title
+                                    color: root.subSelectedIndex === index ? "#0a1d3d" : "#ffffff"
+                                    font.pixelSize: 19
+                                    font.weight: Font.DemiBold
+                                }
+                                Text {
+                                    text: modelData.desc
+                                    color: root.subSelectedIndex === index ? "#305080" : "#80a8d8"
+                                    font.pixelSize: 14
+                                }
                             }
                         }
 
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
-                                root.activePane = 1;
-                                root.rightSelectedIndex = 0;
-                                systemManager.enterRestMode();
-                                soundController.playConfirm();
+                                root.subSelectedIndex = index;
+                                root.triggerSubAction();
                             }
                         }
                     }
@@ -527,16 +664,15 @@ Item {
     // CONSOLE NAVIGATION HANDLERS
     // ==========================================
     function handleUp() {
-        if (activePane === 0) {
+        if (currentLevel === 0) {
             if (selectedCategory > 0) {
                 selectedCategory--;
-                rightSelectedIndex = 0;
                 soundController.playTick();
                 return true;
             }
         } else {
-            if (rightSelectedIndex > 0) {
-                rightSelectedIndex--;
+            if (subSelectedIndex > 0) {
+                subSelectedIndex--;
                 soundController.playTick();
                 return true;
             }
@@ -545,17 +681,16 @@ Item {
     }
 
     function handleDown() {
-        if (activePane === 0) {
+        if (currentLevel === 0) {
             if (selectedCategory < categories.length - 1) {
                 selectedCategory++;
-                rightSelectedIndex = 0;
                 soundController.playTick();
                 return true;
             }
         } else {
-            var maxItems = getMaxRightItems();
-            if (rightSelectedIndex < maxItems - 1) {
-                rightSelectedIndex++;
+            var maxItems = getMaxSubItems();
+            if (subSelectedIndex < maxItems - 1) {
+                subSelectedIndex++;
                 soundController.playTick();
                 return true;
             }
@@ -564,34 +699,30 @@ Item {
     }
 
     function handleLeft() {
-        if (activePane === 1) {
-            // If on Volume slider in Sound category, decrease volume
-            if (selectedCategory === 1 && rightSelectedIndex === 0) {
+        if (currentLevel === 1) {
+            // If on Volume stepper in Sound & Screen, decrease volume
+            if (selectedCategory === 1 && subSelectedIndex === 0) {
                 systemManager.setSystemVolume(Math.max(0, systemManager.systemVolume - 5));
                 soundController.playTick();
                 return true;
             }
-            // Otherwise, return focus to Left category list
-            activePane = 0;
-            soundController.playTick();
+            // Otherwise, slide back to categories list
+            currentLevel = 0;
+            soundController.playBack();
             return true;
         }
         return false;
     }
 
     function handleRight() {
-        if (activePane === 0) {
-            // Move into right pane if category has interactive items
-            var maxItems = getMaxRightItems();
-            if (maxItems > 0) {
-                activePane = 1;
-                rightSelectedIndex = 0;
-                soundController.playTick();
-                return true;
-            }
-        } else if (activePane === 1) {
-            // If on Volume slider, increase volume
-            if (selectedCategory === 1 && rightSelectedIndex === 0) {
+        if (currentLevel === 0) {
+            currentLevel = 1;
+            subSelectedIndex = 0;
+            soundController.playConfirm();
+            return true;
+        } else if (currentLevel === 1) {
+            // If on Volume stepper, increase volume
+            if (selectedCategory === 1 && subSelectedIndex === 0) {
                 systemManager.setSystemVolume(Math.min(100, systemManager.systemVolume + 5));
                 soundController.playTick();
                 return true;
@@ -601,47 +732,49 @@ Item {
     }
 
     function handleConfirm() {
-        if (activePane === 0) {
-            var maxItems = getMaxRightItems();
-            if (maxItems > 0) {
-                activePane = 1;
-                rightSelectedIndex = 0;
-                soundController.playConfirm();
-                return true;
-            }
+        if (currentLevel === 0) {
+            currentLevel = 1;
+            subSelectedIndex = 0;
+            soundController.playConfirm();
+            return true;
         } else {
-            triggerRightAction();
+            triggerSubAction();
             return true;
         }
-        return false;
     }
 
     function handleBack() {
-        if (activePane === 1) {
-            activePane = 0;
+        if (currentLevel === 1) {
+            currentLevel = 0;
             soundController.playBack();
-            return true; // handled internally
+            return true;
         }
-        return false; // let parent close settings
+        return false; // let parent close Settings view
     }
 
-    function getMaxRightItems() {
+    function getMaxSubItems() {
         if (selectedCategory === 1) return 3; // Volume, Mute, BGM
-        if (selectedCategory === 5) return 1; // Rest Mode
+        if (selectedCategory === 5) return 3; // Rest, Turn off, Restart
         return 0;
     }
 
-    function triggerRightAction() {
+    function triggerSubAction() {
         soundController.playConfirm();
         if (selectedCategory === 1) {
-            if (rightSelectedIndex === 1) {
+            if (subSelectedIndex === 0) {
+                systemManager.setSystemVolume(Math.min(100, systemManager.systemVolume + 5));
+            } else if (subSelectedIndex === 1) {
                 systemManager.setIsMuted(!systemManager.isMuted);
-            } else if (rightSelectedIndex === 2) {
+            } else if (subSelectedIndex === 2) {
                 soundController.setBgmEnabled(!soundController.bgmEnabled);
             }
         } else if (selectedCategory === 5) {
-            if (rightSelectedIndex === 0) {
+            if (subSelectedIndex === 0) {
                 systemManager.enterRestMode();
+            } else if (subSelectedIndex === 1) {
+                systemManager.turnOff();
+            } else if (subSelectedIndex === 2) {
+                systemManager.restart();
             }
         }
     }

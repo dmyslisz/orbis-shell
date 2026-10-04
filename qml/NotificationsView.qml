@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 
 Item {
     id: root
@@ -11,10 +10,10 @@ Item {
     signal closeRequested()
 
     readonly property var notificationsList: [
-        { title: "Controller 1 Connected", time: "Just now", icon: "qrc:/assets/icons/gamepad.svg", desc: "DualShock / Gamepad active with low latency" },
-        { title: "Steam Library Indexed", time: "2m ago", icon: "qrc:/assets/icons/steam.svg", desc: "Ready to launch games via Proton" },
-        { title: "Trophy Unlocked: Silky Smooth 60 FPS", time: "5m ago", icon: "qrc:/assets/icons/trophy_gold.svg", desc: "Run the launcher on native Wayland on Fedora Linux" },
-        { title: "Orbis OS Shell Ready", time: "10m ago", icon: "qrc:/assets/icons/settings.svg", desc: "Desktop Environment session active" }
+        { title: "Controller Connected", time: "Just now", icon: "qrc:/assets/icons/gamepad.svg", desc: "Gamepad detected with low latency polling via SDL3" },
+        { title: "Steam Library Synchronized", time: "2m ago", icon: "qrc:/assets/icons/steam.svg", desc: "Installed Steam games discovered and ready" },
+        { title: "PipeWire Audio Active", time: "5m ago", icon: "qrc:/assets/icons/sound.svg", desc: "Hardware audio sink initialized" },
+        { title: "Orbis OS Shell Initialized", time: "10m ago", icon: "qrc:/assets/icons/sysinfo.svg", desc: "Fedora Linux desktop environment session ready" }
     ]
 
     visible: isOpen
@@ -31,15 +30,15 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             height: 100
-            anchors.margins: 60
+            anchors.margins: 70
 
             Row {
-                spacing: 20
+                spacing: 16
                 anchors.verticalCenter: parent.verticalCenter
 
                 Image {
-                    width: 36
-                    height: 36
+                    width: 32
+                    height: 32
                     source: "qrc:/assets/icons/notifications.svg"
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -47,31 +46,28 @@ Item {
                 Text {
                     text: "Notifications"
                     color: "#ffffff"
-                    font.pixelSize: 32
+                    font.pixelSize: 30
                     font.weight: Font.DemiBold
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
 
-            // Back hint
+            // Action hints
             Row {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 8
+                spacing: 24
 
-                Image {
-                    width: 22
-                    height: 22
-                    source: "qrc:/assets/icons/buttons/PS4_Circle.png"
-                    fillMode: Image.PreserveAspectFit
-                    anchors.verticalCenter: parent.verticalCenter
+                Row {
+                    spacing: 8
+                    Image { width: 20; height: 20; source: "qrc:/assets/icons/buttons/PS4_Cross.png"; fillMode: Image.PreserveAspectFit; anchors.verticalCenter: parent.verticalCenter }
+                    Text { text: "View"; color: "#ffffff"; font.pixelSize: 16; anchors.verticalCenter: parent.verticalCenter }
                 }
 
-                Text {
-                    text: "Back"
-                    color: "#ffffff"
-                    font.pixelSize: 18
-                    anchors.verticalCenter: parent.verticalCenter
+                Row {
+                    spacing: 8
+                    Image { width: 20; height: 20; source: "qrc:/assets/icons/buttons/PS4_Circle.png"; fillMode: Image.PreserveAspectFit; anchors.verticalCenter: parent.verticalCenter }
+                    Text { text: "Back"; color: "#ffffff"; font.pixelSize: 16; anchors.verticalCenter: parent.verticalCenter }
                 }
             }
         }
@@ -87,11 +83,11 @@ Item {
         ListView {
             id: notifListView
             anchors.top: header.bottom
-            anchors.topMargin: 30
+            anchors.topMargin: 24
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.margins: 60
+            anchors.margins: 70
             spacing: 10
             model: root.notificationsList
 
@@ -99,28 +95,31 @@ Item {
                 required property int index
                 required property var modelData
                 width: notifListView.width
-                height: 74
+                height: 72
 
                 readonly property bool isSelected: root.selectedIndex === index
 
                 Rectangle {
                     anchors.fill: parent
                     radius: 6
-                    color: isSelected ? "#ffffff" : "#0d1e38"
-                    border.color: isSelected ? "#ffffff" : "#18ffffff"
+                    color: isSelected ? "#ffffff" : "#0e1e3a"
+                    border.color: isSelected ? "#ffffff" : "#20ffffff"
                     border.width: isSelected ? 2 : 1
+
+                    Behavior on color { ColorAnimation { duration: 120 } }
 
                     Row {
                         anchors.fill: parent
-                        anchors.margins: 16
+                        anchors.margins: 18
                         spacing: 20
 
                         Image {
-                            width: 34
-                            height: 34
+                            width: 32
+                            height: 32
                             source: modelData.icon
                             fillMode: Image.PreserveAspectFit
                             anchors.verticalCenter: parent.verticalCenter
+                            opacity: isSelected ? 0.95 : 0.75
                         }
 
                         Column {
@@ -136,7 +135,7 @@ Item {
 
                             Text {
                                 text: modelData.desc
-                                color: isSelected ? "#2a4d7d" : "#90a8c8"
+                                color: isSelected ? "#2a4d7d" : "#80a8d8"
                                 font.pixelSize: 14
                             }
                         }
@@ -147,6 +146,14 @@ Item {
                             text: modelData.time
                             color: isSelected ? "#0a1d3d" : "#6080a0"
                             font.pixelSize: 14
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            root.selectedIndex = index;
+                            soundController.playConfirm();
                         }
                     }
                 }

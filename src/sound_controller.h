@@ -82,6 +82,9 @@ private:
     double m_bgmVolume = 0.40;
     bool m_pitchVariation = true;
     bool m_homeScreenMusicPlaying = false;
+    QTimer m_bgmLoopTimer;
+
+    void checkBgmLoop();
 
     int m_lastTickIdx = 0;
 

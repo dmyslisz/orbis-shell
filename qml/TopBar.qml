@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Controls
 
 Item {
     id: root
@@ -7,24 +6,14 @@ Item {
     height: 1080
 
     property bool isFocused: false
-    property int selectedIndex: 1
-    property string userName: "Player 1"
+    property int selectedIndex: 0
+    property string userName: "User 1"
     property string userAvatar: "qrc:/assets/avatars/avatar_luchador.svg"
-    property string trophyCount: "★ 18"
 
     signal iconSelected(int index, string name)
-    signal returnToTiles()
 
     readonly property var icons: [
-        { id: "plus", name: "PlayStation Plus", icon: "qrc:/assets/icons/ps_plus.svg" },
-        { id: "notifications", name: "Notifications", icon: "qrc:/assets/icons/notifications.svg", badge: "2" },
-        { id: "friends", name: "Friends", icon: "qrc:/assets/icons/friends.svg", badge: "4" },
-        { id: "communities", name: "Communities", icon: "qrc:/assets/icons/communities.svg" },
-        { id: "events", name: "Events", icon: "qrc:/assets/icons/events.svg" },
-        { id: "messages", name: "Messages", icon: "qrc:/assets/icons/messages.svg" },
-        { id: "party", name: "Party", icon: "qrc:/assets/icons/party.svg" },
-        { id: "profile", name: "Profile", icon: "qrc:/assets/icons/profile.svg", isAvatar: true },
-        { id: "trophies", name: "Trophies", icon: "qrc:/assets/icons/trophy.svg" },
+        { id: "notifications", name: "Notifications", icon: "qrc:/assets/icons/notifications.svg" },
         { id: "settings", name: "Settings", icon: "qrc:/assets/icons/settings.svg" },
         { id: "power", name: "Power", icon: "qrc:/assets/icons/power.svg" }
     ]
@@ -34,23 +23,24 @@ Item {
     // ==========================================
     Row {
         anchors.top: parent.top
-        anchors.topMargin: 52
+        anchors.topMargin: 50
         anchors.right: parent.right
         anchors.rightMargin: 80
         spacing: 16
         height: 32
+        z: 10
 
         // Network icon
         Image {
-            width: 22
-            height: 22
+            width: 20
+            height: 20
             source: "qrc:/assets/icons/WiFiHigh.png"
             fillMode: Image.PreserveAspectFit
             anchors.verticalCenter: parent.verticalCenter
-            opacity: systemManager.isOnline ? 0.95 : 0.35
+            opacity: systemManager.isOnline ? 0.95 : 0.4
         }
 
-        // Battery level
+        // Battery indicator
         Row {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 4
@@ -73,7 +63,7 @@ Item {
                     color: systemManager.isCharging ? "#66bb6a" : (systemManager.batteryPercent < 20 ? "#ef5350" : "#ffffff")
                 }
             }
-            // Battery tip
+
             Rectangle {
                 width: 2
                 height: 6
@@ -101,170 +91,33 @@ Item {
     }
 
     // ==========================================
-    // 2. COMPACT TOP STATUS BAR (When TileRow is active)
+    // 2. MAIN FUNCTION BAR (Slides down when focused like PS4)
     // ==========================================
     Item {
-        id: compactBar
-        anchors.top: parent.top
-        anchors.topMargin: 52
-        anchors.left: parent.left
-        anchors.leftMargin: 80
-        anchors.right: parent.right
-        anchors.rightMargin: 240
-        height: 36
-        opacity: root.isFocused ? 0.0 : 1.0
-        visible: opacity > 0.01
-
-        Behavior on opacity {
-            NumberAnimation { duration: 180; easing.type: Easing.OutQuad }
-        }
-
-        Row {
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 24
-
-            Image {
-                width: 22
-                height: 22
-                source: "qrc:/assets/icons/ps_plus.svg"
-                fillMode: Image.PreserveAspectFit
-            }
-
-            Row {
-                spacing: 6
-                Image {
-                    width: 22
-                    height: 22
-                    source: "qrc:/assets/icons/notifications.svg"
-                    fillMode: Image.PreserveAspectFit
-                }
-                Rectangle {
-                    width: 18
-                    height: 18
-                    radius: 9
-                    color: "#006FCD"
-                    border.color: "#ffffff"
-                    border.width: 1
-                    Text {
-                        anchors.centerIn: parent
-                        text: "2"
-                        color: "#ffffff"
-                        font.pixelSize: 11
-                        font.weight: Font.Bold
-                    }
-                }
-            }
-
-            Row {
-                spacing: 6
-                Image {
-                    width: 22
-                    height: 22
-                    source: "qrc:/assets/icons/friends.svg"
-                    fillMode: Image.PreserveAspectFit
-                }
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: "4"
-                    color: "#ffffff"
-                    font.pixelSize: 14
-                }
-            }
-        }
-
-        // Right group: Profile + Trophies
-        Row {
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: 24
-
-            // User Profile
-            Row {
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 8
-
-                // Online indicator
-                Rectangle {
-                    width: 8
-                    height: 8
-                    radius: 4
-                    color: "#4caf50"
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                // Square avatar
-                Rectangle {
-                    width: 24
-                    height: 24
-                    radius: 3
-                    color: "#1a3560"
-                    clip: true
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    Image {
-                        anchors.fill: parent
-                        source: root.userAvatar
-                    }
-                }
-
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: root.userName
-                    color: "#ffffff"
-                    font.pixelSize: 15
-                }
-            }
-
-            // Trophies count
-            Row {
-                anchors.verticalCenter: parent.verticalCenter
-                spacing: 6
-
-                Image {
-                    width: 18
-                    height: 18
-                    source: "qrc:/assets/icons/trophy.svg"
-                    fillMode: Image.PreserveAspectFit
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: root.trophyCount
-                    color: "#fbc02d"
-                    font.pixelSize: 15
-                    font.weight: Font.Medium
-                }
-            }
-        }
-    }
-
-    // ==========================================
-    // 3. FULL EXPANDED TOP BAR (When TopBar is focused)
-    // ==========================================
-    Item {
-        id: expandedBar
-        anchors.top: parent.top
-        anchors.topMargin: 110
+        id: barContainer
         anchors.left: parent.left
         anchors.leftMargin: 80
         anchors.right: parent.right
         anchors.rightMargin: 80
-        height: 140
-        opacity: root.isFocused ? 1.0 : 0.0
-        visible: opacity > 0.01
+        height: 180
 
-        Behavior on opacity {
-            NumberAnimation { duration: 200; easing.type: Easing.OutQuad }
+        // In PS4: Top bar sits at y: 48 when unfocused; slides down to y: 210 when focused!
+        y: root.isFocused ? 200 : 48
+
+        Behavior on y {
+            NumberAnimation { duration: 250; easing.type: Easing.OutQuad }
         }
 
-        // Horizontal Row of big icons
+        // Icons Row
         Row {
             id: iconsRow
             anchors.top: parent.top
             anchors.left: parent.left
-            spacing: 28
+            spacing: root.isFocused ? 32 : 24
+
+            Behavior on spacing {
+                NumberAnimation { duration: 200; easing.type: Easing.OutQuad }
+            }
 
             Repeater {
                 model: root.icons
@@ -272,71 +125,67 @@ Item {
                 Item {
                     required property int index
                     required property var modelData
-                    width: 54
-                    height: 54
+                    width: root.isFocused ? 58 : 40
+                    height: root.isFocused ? 58 : 40
 
                     readonly property bool isSelected: root.isFocused && root.selectedIndex === index
 
+                    Behavior on width { NumberAnimation { duration: 180 } }
+                    Behavior on height { NumberAnimation { duration: 180 } }
+
                     Rectangle {
                         anchors.centerIn: parent
-                        width: isSelected ? 58 : 46
-                        height: isSelected ? 58 : 46
+                        width: isSelected ? 62 : parent.width
+                        height: isSelected ? 62 : parent.height
                         radius: 8
                         color: isSelected ? "#3060a0" : "transparent"
                         border.color: isSelected ? "#ffffff" : "transparent"
                         border.width: isSelected ? 2.5 : 0
 
-                        Behavior on width { NumberAnimation { duration: 150 } }
-                        Behavior on height { NumberAnimation { duration: 150 } }
+                        Behavior on width { NumberAnimation { duration: 160 } }
+                        Behavior on height { NumberAnimation { duration: 160 } }
 
                         Image {
                             anchors.centerIn: parent
-                            width: isSelected ? 36 : 28
-                            height: isSelected ? 36 : 28
-                            source: modelData.isAvatar ? root.userAvatar : modelData.icon
+                            width: isSelected ? 34 : (root.isFocused ? 28 : 22)
+                            height: isSelected ? 34 : (root.isFocused ? 28 : 22)
+                            source: modelData.icon
                             fillMode: Image.PreserveAspectFit
-                            opacity: isSelected ? 1.0 : 0.75
-                        }
+                            opacity: isSelected ? 1.0 : (root.isFocused ? 0.8 : 0.65)
 
-                        // Badge counter (if any)
-                        Rectangle {
-                            visible: modelData.badge !== undefined
-                            anchors.top: parent.top
-                            anchors.topMargin: -4
-                            anchors.right: parent.right
-                            anchors.rightMargin: -4
-                            width: 18
-                            height: 18
-                            radius: 9
-                            color: "#006FCD"
-                            border.color: "#ffffff"
-                            border.width: 1
-                            Text {
-                                anchors.centerIn: parent
-                                text: modelData.badge !== undefined ? modelData.badge : ""
-                                color: "#ffffff"
-                                font.pixelSize: 10
-                                font.weight: Font.Bold
-                            }
+                            Behavior on width { NumberAnimation { duration: 160 } }
+                            Behavior on height { NumberAnimation { duration: 160 } }
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            root.selectedIndex = index;
+                            iconSelected(index, modelData.name);
                         }
                     }
                 }
             }
         }
 
-        // Label beneath focused icon
+        // Focused Item Label (displayed directly under the active icon)
         Text {
             anchors.top: iconsRow.bottom
-            anchors.topMargin: 18
+            anchors.topMargin: 16
             anchors.left: parent.left
-            x: root.selectedIndex * (54 + 28)
+            x: root.selectedIndex * (58 + 32)
             text: root.icons[root.selectedIndex].name
             color: "#ffffff"
-            font.pixelSize: 20
+            font.pixelSize: 22
             font.weight: Font.Medium
+            opacity: root.isFocused ? 1.0 : 0.0
 
             Behavior on x {
-                NumberAnimation { duration: 160; easing.type: Easing.OutQuad }
+                NumberAnimation { duration: 180; easing.type: Easing.OutQuad }
+            }
+            Behavior on opacity {
+                NumberAnimation { duration: 160 }
             }
         }
     }
