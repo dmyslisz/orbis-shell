@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Orbis OS (X11)
+Comment=PS4-style console desktop environment for gaming and entertainment (X11)
+Exec=orbis-session
+Type=Application
+DesktopNames=Orbis
+Keywords=launch;game;console;session;

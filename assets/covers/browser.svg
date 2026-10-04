@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="brGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0052D4"/>
+      <stop offset="50%" stop-color="#4364F7"/>
+      <stop offset="100%" stop-color="#6FB1FC"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#brGrad)"/>
+  <circle cx="256" cy="220" r="100" stroke="#ffffff" stroke-width="12" fill="none"/>
+  <ellipse cx="256" cy="220" rx="45" ry="100" stroke="#ffffff" stroke-width="10" fill="none"/>
+  <line x1="156" y1="220" x2="356" y2="220" stroke="#ffffff" stroke-width="10"/>
+  <text x="256" y="410" fill="#ffffff" font-size="38" font-family="sans-serif" font-weight="bold" text-anchor="middle" letter-spacing="2">INTERNET</text>
+</svg>

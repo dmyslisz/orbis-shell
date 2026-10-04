@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <linearGradient id="storeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0066d6"/>
+      <stop offset="100%" stop-color="#003e99"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" fill="url(#storeGrad)"/>
+  <path d="M42 38 C42 27, 50 18, 60 18 C70 18, 78 27, 78 38" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
+  <path d="M28 40 L92 40 L86 100 L34 100 Z" fill="#ffffff"/>
+  <polygon points="60,54 48,74 72,74" fill="#004bb3"/>
+</svg>

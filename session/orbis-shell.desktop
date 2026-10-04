@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Orbis OS Shell
+Comment=PS4-style console launcher and desktop environment
+Exec=orbis-shell
+Icon=launcher_logo
+Terminal=false
+Type=Application
+Categories=Game;System;Utility;
+Keywords=ps4;orbis;console;launcher;steam;gamepad;
+StartupNotify=true

@@ -1,0 +1,316 @@
+import QtQuick
+import QtQuick.Controls
+
+Item {
+    id: root
+    width: parent.width
+    height: 1080
+
+    property var currentAppData: null
+    property bool isOpen: false
+    property int selectedDeckItem: 0
+
+    signal launchRequested()
+    signal closeRequested()
+
+    y: isOpen ? 0 : 1080
+    visible: y < 1079
+    opacity: isOpen ? 1.0 : 0.0
+
+    Behavior on y {
+        NumberAnimation { duration: 240; easing.type: Easing.OutQuad }
+    }
+    Behavior on opacity {
+        NumberAnimation { duration: 200 }
+    }
+
+    Item {
+        anchors.fill: parent
+        anchors.margins: 80
+        anchors.topMargin: 160
+
+        Column {
+            spacing: 32
+            width: parent.width
+
+            // Header Row: App icon, Title, Playtime
+            Row {
+                spacing: 24
+                anchors.left: parent.left
+
+                Rectangle {
+                    width: 72
+                    height: 72
+                    radius: 6
+                    color: "#0a1d3d"
+                    border.color: "#ffffff"
+                    border.width: 2
+                    clip: true
+
+                    Image {
+                        anchors.fill: parent
+                        source: (root.currentAppData && root.currentAppData.icon) ? root.currentAppData.icon : ""
+                        fillMode: Image.PreserveAspectCrop
+                    }
+                }
+
+                Column {
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 6
+
+                    Text {
+                        text: (root.currentAppData && root.currentAppData.name) ? root.currentAppData.name : ""
+                        color: "#ffffff"
+                        font.pixelSize: 32
+                        font.weight: Font.DemiBold
+                    }
+
+                    Text {
+                        text: (root.currentAppData && root.currentAppData.context && root.currentAppData.context.playtime) ? root.currentAppData.context.playtime : "Installed"
+                        color: "#a0c0e8"
+                        font.pixelSize: 16
+                    }
+                }
+            }
+
+            // Primary Big Action Card ("Start" / "Resume")
+            Row {
+                spacing: 24
+
+                Rectangle {
+                    width: 220
+                    height: 64
+                    radius: 6
+                    color: root.selectedDeckItem === 0 ? "#ffffff" : "#c0001844"
+                    border.color: "#ffffff"
+                    border.width: root.selectedDeckItem === 0 ? 3 : 1.5
+
+                    scale: root.selectedDeckItem === 0 ? 1.05 : 1.0
+                    Behavior on scale { NumberAnimation { duration: 150 } }
+
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: 12
+
+                        Image {
+                            width: 24
+                            height: 24
+                            source: root.selectedDeckItem === 0 ? "qrc:/assets/icons/buttons/PS4_Cross.png" : "qrc:/assets/icons/buttons/PS4_Cross.png"
+                            fillMode: Image.PreserveAspectFit
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            text: (processLauncher.isAppRunning && processLauncher.currentAppName === (root.currentAppData ? root.currentAppData.name : "")) ? "Resume" : "Start"
+                            color: root.selectedDeckItem === 0 ? "#001844" : "#ffffff"
+                            font.pixelSize: 22
+                            font.weight: Font.Bold
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                }
+
+                // Options hint
+                Rectangle {
+                    width: 160
+                    height: 64
+                    radius: 6
+                    color: "#80001030"
+                    border.color: "#30ffffff"
+                    border.width: 1
+
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: 10
+
+                        Image {
+                            width: 22
+                            height: 22
+                            source: "qrc:/assets/icons/buttons/PS4_Options.png"
+                            fillMode: Image.PreserveAspectFit
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            text: "Options"
+                            color: "#c0d4f0"
+                            font.pixelSize: 18
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                    }
+                }
+            }
+
+            // Cards Row: Overview, Patch Notes / Activities, Trophies
+            Row {
+                spacing: 28
+                width: parent.width
+
+                // Card 1: Overview
+                Rectangle {
+                    width: 480
+                    height: 320
+                    radius: 8
+                    color: "#b0081c3c"
+                    border.color: root.selectedDeckItem === 1 ? "#ffffff" : "#20ffffff"
+                    border.width: root.selectedDeckItem === 1 ? 2.5 : 1
+
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 28
+                        spacing: 16
+
+                        Text {
+                            text: (root.currentAppData && root.currentAppData.context && root.currentAppData.context.headline) ? root.currentAppData.context.headline : "Overview"
+                            color: "#ffffff"
+                            font.pixelSize: 20
+                            font.weight: Font.DemiBold
+                        }
+
+                        Text {
+                            width: parent.width
+                            text: (root.currentAppData && root.currentAppData.context && root.currentAppData.context.description) ? root.currentAppData.context.description : "No description available for this application."
+                            color: "#b0c8e8"
+                            font.pixelSize: 15
+                            wrapMode: Text.WordWrap
+                            lineHeight: 1.3
+                        }
+                    }
+                }
+
+                // Card 2: Recent Activities & Version
+                Rectangle {
+                    width: 480
+                    height: 320
+                    radius: 8
+                    color: "#b0081c3c"
+                    border.color: root.selectedDeckItem === 2 ? "#ffffff" : "#20ffffff"
+                    border.width: root.selectedDeckItem === 2 ? 2.5 : 1
+
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 28
+                        spacing: 18
+
+                        Text {
+                            text: "Recent Activities & Notes"
+                            color: "#ffffff"
+                            font.pixelSize: 20
+                            font.weight: Font.DemiBold
+                        }
+
+                        Row {
+                            spacing: 12
+                            Rectangle {
+                                width: 8
+                                height: 8
+                                radius: 4
+                                color: "#006FCD"
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Text {
+                                text: (root.currentAppData && root.currentAppData.context && root.currentAppData.context.patchNotes) ? root.currentAppData.context.patchNotes : "Latest Version"
+                                color: "#ffffff"
+                                font.pixelSize: 16
+                            }
+                        }
+
+                        Text {
+                            width: parent.width
+                            text: "Optimized for Fedora 44 Linux. Full controller vibration, analog triggers, and instant resume support enabled."
+                            color: "#a0c0e8"
+                            font.pixelSize: 14
+                            wrapMode: Text.WordWrap
+                            lineHeight: 1.3
+                        }
+                    }
+                }
+
+                // Card 3: Trophies Summary
+                Rectangle {
+                    width: 480
+                    height: 320
+                    radius: 8
+                    color: "#b0081c3c"
+                    border.color: root.selectedDeckItem === 3 ? "#ffffff" : "#20ffffff"
+                    border.width: root.selectedDeckItem === 3 ? 2.5 : 1
+
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 28
+                        spacing: 20
+
+                        Text {
+                            text: "Trophies"
+                            color: "#ffffff"
+                            font.pixelSize: 20
+                            font.weight: Font.DemiBold
+                        }
+
+                        Row {
+                            spacing: 16
+                            Image {
+                                width: 44
+                                height: 44
+                                source: "qrc:/assets/icons/trophy_platinum.svg"
+                                fillMode: Image.PreserveAspectFit
+                            }
+                            Column {
+                                spacing: 4
+                                anchors.verticalCenter: parent.verticalCenter
+                                Text {
+                                    text: "Progress: 68%"
+                                    color: "#ffffff"
+                                    font.pixelSize: 16
+                                    font.weight: Font.Medium
+                                }
+                                Text {
+                                    text: "1 Platinum, 4 Gold, 12 Silver"
+                                    color: "#a0c0e8"
+                                    font.pixelSize: 14
+                                }
+                            }
+                        }
+
+                        // Progress bar
+                        Rectangle {
+                            width: parent.width
+                            height: 8
+                            radius: 4
+                            color: "#182a46"
+
+                            Rectangle {
+                                width: parent.width * 0.68
+                                height: parent.height
+                                radius: 4
+                                color: "#fbc02d"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function selectPrevious() {
+        if (selectedDeckItem > 0) {
+            selectedDeckItem--;
+            return true;
+        }
+        return false;
+    }
+
+    function selectNext() {
+        if (selectedDeckItem < 3) {
+            selectedDeckItem++;
+            return true;
+        }
+        return false;
+    }
+
+    function triggerCurrent() {
+        if (selectedDeckItem === 0) {
+            launchRequested();
+        }
+    }
+}

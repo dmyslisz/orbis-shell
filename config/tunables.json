@@ -1,0 +1,37 @@
+{
+  "tile": {
+    "width": 204,
+    "height": 204,
+    "focusedScale": 1.14,
+    "scaleDurationMs": 190,
+    "shiftDurationMs": 210,
+    "spacing": 20,
+    "expandedExtraSpacing": 32,
+    "borderWidth": 3.0,
+    "focusBorderColor": "#ffffff",
+    "focusGlowColor": "#99ccff",
+    "focusGlowAlpha": 0.45
+  },
+  "motion": {
+    "backgroundDriftSpeed": 0.00045,
+    "screenFadeDurationMs": 220,
+    "deckSlideDurationMs": 240
+  },
+  "sound": {
+    "masterVolume": 0.65,
+    "sfxVolume": 0.70,
+    "bgmVolume": 0.40,
+    "bgmEnabled": true,
+    "pitchVariation": true
+  },
+  "navigation": {
+    "keyRepeatInitialDelayMs": 250,
+    "keyRepeatMinIntervalMs": 70,
+    "keyRepeatAcceleration": 0.85
+  },
+  "system": {
+    "scanXdgApps": true,
+    "scanSteamGames": true,
+    "showClock24h": false
+  }
+}

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="fireBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#194284"/>
+      <stop offset="100%" stop-color="#08142a"/>
+    </radialGradient>
+    <linearGradient id="flame" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff1e00"/>
+      <stop offset="40%" stop-color="#ff8800"/>
+      <stop offset="100%" stop-color="#ffe600"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="12" fill="url(#fireBg)"/>
+  <!-- Fire tail -->
+  <path d="M20 90 C15 70, 30 55, 20 40 C35 48, 45 42, 50 30 C58 45, 75 35, 80 20 C85 40, 100 45, 110 50 C95 65, 80 60, 75 80 C65 72, 45 95, 20 90 Z" fill="url(#flame)"/>
+  <!-- Ball -->
+  <circle cx="78" cy="68" r="26" fill="#f8f9fa" stroke="#222" stroke-width="2"/>
+  <polygon points="78,54 87,61 83,72 73,72 69,61" fill="#111"/>
+  <line x1="78" y1="54" x2="78" y2="43" stroke="#222" stroke-width="2"/>
+  <line x1="87" y1="61" x2="98" y2="58" stroke="#222" stroke-width="2"/>
+  <line x1="83" y1="72" x2="92" y2="81" stroke="#222" stroke-width="2"/>
+  <line x1="73" y1="72" x2="66" y2="82" stroke="#222" stroke-width="2"/>
+  <line x1="69" y1="61" x2="58" y2="60" stroke="#222" stroke-width="2"/>
+</svg>

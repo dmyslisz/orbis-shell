@@ -1,0 +1,65 @@
+[
+  {
+    "id": "trophy_plat_master",
+    "title": "Master of Orbis",
+    "description": "Unlock all trophies in Orbis OS Desktop Session.",
+    "type": "platinum",
+    "unlocked": false,
+    "unlockedDate": "",
+    "rarity": "Ultra Rare (0.8%)"
+  },
+  {
+    "id": "trophy_boot",
+    "title": "Welcome to Orbis OS",
+    "description": "Successfully power on and complete initial boot setup.",
+    "type": "bronze",
+    "unlocked": true,
+    "unlockedDate": "10/04/2026 16:40",
+    "rarity": "Common (98.4%)"
+  },
+  {
+    "id": "trophy_first_launch",
+    "title": "Press Cross to Start",
+    "description": "Launch your first game or application from the Content Ribbon.",
+    "type": "bronze",
+    "unlocked": true,
+    "unlockedDate": "10/04/2026 16:42",
+    "rarity": "Very Common (89.2%)"
+  },
+  {
+    "id": "trophy_steam_linked",
+    "title": "Steam Deck Challenger",
+    "description": "Discover and index games from the local Steam library.",
+    "type": "silver",
+    "unlocked": true,
+    "unlockedDate": "10/04/2026 16:43",
+    "rarity": "Rare (42.1%)"
+  },
+  {
+    "id": "trophy_quick_menu",
+    "title": "Power User",
+    "description": "Access the Quick Menu by holding the PS button.",
+    "type": "silver",
+    "unlocked": true,
+    "unlockedDate": "10/04/2026 16:44",
+    "rarity": "Uncommon (58.3%)"
+  },
+  {
+    "id": "trophy_audiophile",
+    "title": "Orbis Symphony",
+    "description": "Listen to the complete ambient home screen soundtrack.",
+    "type": "gold",
+    "unlocked": false,
+    "unlockedDate": "",
+    "rarity": "Very Rare (14.6%)"
+  },
+  {
+    "id": "trophy_wayland_native",
+    "title": "Silky Smooth 60 FPS",
+    "description": "Run the launcher on native Wayland on Fedora Linux.",
+    "type": "gold",
+    "unlocked": true,
+    "unlockedDate": "10/04/2026 16:45",
+    "rarity": "Rare (27.5%)"
+  }
+]

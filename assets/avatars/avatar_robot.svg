@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="botBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0088cc"/>
+      <stop offset="100%" stop-color="#002244"/>
+    </radialGradient>
+  </defs>
+  <rect width="120" height="120" rx="12" fill="url(#botBg)"/>
+  <!-- Head -->
+  <rect x="32" y="32" width="56" height="52" rx="18" fill="#f0f4f8" stroke="#0099ff" stroke-width="3"/>
+  <!-- Antenna -->
+  <line x1="60" y1="32" x2="60" y2="18" stroke="#0099ff" stroke-width="3"/>
+  <circle cx="60" cy="16" r="4" fill="#00ffff"/>
+  <!-- Glowing Cyan Visor -->
+  <rect x="40" y="44" width="40" height="20" rx="8" fill="#001830"/>
+  <ellipse cx="50" cy="54" rx="4" ry="5" fill="#00ffff"/>
+  <ellipse cx="70" cy="54" rx="4" ry="5" fill="#00ffff"/>
+  <!-- Ear pieces -->
+  <rect x="25" y="46" width="7" height="16" rx="3.5" fill="#0099ff"/>
+  <rect x="88" y="46" width="7" height="16" rx="3.5" fill="#0099ff"/>
+</svg>

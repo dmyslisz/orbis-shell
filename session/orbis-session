@@ -1,0 +1,32 @@
+#!/bin/bash
+# Orbis OS Session Runner for Fedora Linux
+set -e
+
+export XDG_CURRENT_DESKTOP=Orbis
+export XDG_SESSION_DESKTOP=orbis-shell
+export QT_AUTO_SCREEN_SCALE_FACTOR=1
+
+# Audio environment
+if command -v systemctl >/dev/null 2>&1; then
+    systemctl --user start pipewire pipewire-pulse wireplumber 2>/dev/null || true
+fi
+
+# Determine display mode
+if [ -n "$WAYLAND_DISPLAY" ]; then
+    export QT_QPA_PLATFORM=wayland
+    exec orbis-shell "$@"
+elif [ -n "$DISPLAY" ]; then
+    export QT_QPA_PLATFORM=xcb
+    exec orbis-shell "$@"
+elif command -v cage >/dev/null 2>&1; then
+    # Standalone Wayland kiosk mode via Cage
+    export QT_QPA_PLATFORM=wayland
+    exec cage -- orbis-shell "$@"
+elif command -v gamescope >/dev/null 2>&1; then
+    # Standalone Gamescope console mode
+    exec gamescope -f -e -- orbis-shell "$@"
+else
+    # Default direct Wayland shell
+    export QT_QPA_PLATFORM=wayland
+    exec orbis-shell "$@"
+fi

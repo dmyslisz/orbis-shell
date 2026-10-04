@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <linearGradient id="llamaBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00d2ff"/>
+      <stop offset="100%" stop-color="#0055aa"/>
+    </linearGradient>
+    <linearGradient id="purple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d65db1"/>
+      <stop offset="100%" stop-color="#845ec2"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="12" fill="url(#llamaBg)"/>
+  <!-- Ears -->
+  <polygon points="42,16 50,38 36,38" fill="url(#purple)"/>
+  <polygon points="78,16 84,38 70,38" fill="url(#purple)"/>
+  <!-- Head & Snout -->
+  <polygon points="38,36 82,36 88,70 65,70 60,95 48,95 42,70 34,50" fill="url(#purple)" stroke="#5d3b9e" stroke-width="2"/>
+  <!-- Teeth / Open jaw -->
+  <rect x="58" y="74" width="26" height="16" fill="#f8f9fa" rx="2" stroke="#333" stroke-width="1.5"/>
+  <polygon points="62,90 82,90 76,104 66,104" fill="#6a359c"/>
+  <!-- Big Googley Eye -->
+  <circle cx="50" cy="50" r="10" fill="#ffffff" stroke="#333" stroke-width="2"/>
+  <circle cx="50" cy="50" r="4.5" fill="#111111"/>
+  <!-- Harness band -->
+  <path d="M40 58 L78 62" stroke="#00c9a7" stroke-width="4" stroke-linecap="round"/>
+</svg>

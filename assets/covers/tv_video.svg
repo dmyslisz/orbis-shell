@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="tvGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c31432"/>
+      <stop offset="100%" stop-color="#240b36"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#tvGrad)"/>
+  <rect x="126" y="130" width="260" height="170" rx="16" stroke="#ffffff" stroke-width="14" fill="none"/>
+  <polygon points="230,175 305,215 230,255" fill="#ffffff"/>
+  <line x1="200" y1="340" x2="312" y2="340" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+  <line x1="256" y1="300" x2="256" y2="340" stroke="#ffffff" stroke-width="12"/>
+  <text x="256" y="420" fill="#ffffff" font-size="40" font-family="sans-serif" font-weight="bold" text-anchor="middle" letter-spacing="2">TV &amp; VIDEO</text>
+</svg>

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "user_1",
+    "name": "PlayStation Player",
+    "avatar": "qrc:/assets/avatars/avatar_luchador.svg",
+    "trophyLevel": 18,
+    "trophies": {
+      "platinum": 4,
+      "gold": 22,
+      "silver": 58,
+      "bronze": 210
+    },
+    "plusMember": true,
+    "isCurrent": true
+  },
+  {
+    "id": "user_2",
+    "name": "Guest",
+    "avatar": "qrc:/assets/avatars/avatar_fox.svg",
+    "trophyLevel": 1,
+    "trophies": {
+      "platinum": 0,
+      "gold": 0,
+      "silver": 2,
+      "bronze": 8
+    },
+    "plusMember": false,
+    "isCurrent": false
+  }
+]

@@ -1,0 +1,11 @@
+build/
+bin/
+*.user
+*.user.*
+*.autosave
+.vscode/
+.idea/
+*.swp
+*.o
+*.obj
+assets/sounds/flac/

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="boyBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#2c7be5"/>
+      <stop offset="100%" stop-color="#0e2a5c"/>
+    </radialGradient>
+  </defs>
+  <rect width="120" height="120" rx="12" fill="url(#boyBg)"/>
+  <!-- Face -->
+  <circle cx="60" cy="65" r="36" fill="#ffe0bd"/>
+  <circle cx="38" cy="70" r="6" fill="#ffb4a2" opacity="0.6"/>
+  <circle cx="82" cy="70" r="6" fill="#ffb4a2" opacity="0.6"/>
+  <!-- Hair -->
+  <path d="M26 56 C26 26, 94 26, 94 56 C90 52, 80 48, 70 54 C60 48, 48 52, 40 48 C32 50, 28 54, 26 56 Z" fill="#4a2e18"/>
+  <!-- Eyes -->
+  <ellipse cx="48" cy="62" rx="3.5" ry="5" fill="#1a1a1a"/>
+  <ellipse cx="72" cy="62" rx="3.5" ry="5" fill="#1a1a1a"/>
+  <!-- Smile -->
+  <path d="M48 76 C54 84, 66 84, 72 76" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" fill="none"/>
+</svg>

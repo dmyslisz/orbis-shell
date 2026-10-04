@@ -1,0 +1,130 @@
+[
+  {
+    "id": "whats_new",
+    "name": "What's New",
+    "icon": "qrc:/assets/covers/whats_new.svg",
+    "exec": "",
+    "isSystem": true,
+    "gradientStart": "#006FCD",
+    "gradientEnd": "#001844",
+    "context": {
+      "headline": "Latest Activities & Updates",
+      "description": "See what your friends are playing, view system news, and check out new games and features available on your Orbis OS system.",
+      "playtime": "Always Active",
+      "patchNotes": "Orbis OS Shell v1.0.0 (Fedora 44 Edition)",
+      "badge": "COMMUNITY"
+    }
+  },
+  {
+    "id": "steam",
+    "name": "Steam",
+    "icon": "qrc:/assets/covers/steam.svg",
+    "exec": "steam",
+    "isSystem": false,
+    "gradientStart": "#1b2838",
+    "gradientEnd": "#0d1217",
+    "context": {
+      "headline": "The Ultimate Entertainment Platform",
+      "description": "Play thousands of native Linux and Proton games directly with complete gamepad support and cloud save synchronization.",
+      "playtime": "240 Hours Played",
+      "patchNotes": "Steam Client Native Linux Runtime",
+      "badge": "DIGITAL"
+    }
+  },
+  {
+    "id": "browser",
+    "name": "Internet Browser",
+    "icon": "qrc:/assets/covers/browser.svg",
+    "exec": "firefox",
+    "isSystem": false,
+    "gradientStart": "#0052D4",
+    "gradientEnd": "#102a6b",
+    "context": {
+      "headline": "World Wide Web",
+      "description": "Browse the web, stream videos, and visit your favorite websites with hardware acceleration on Wayland.",
+      "playtime": "58 Hours",
+      "patchNotes": "Mozilla Firefox / Wayland Native",
+      "badge": "APP"
+    }
+  },
+  {
+    "id": "retroarch",
+    "name": "RetroArch",
+    "icon": "qrc:/assets/covers/retroarch.svg",
+    "exec": "retroarch",
+    "isSystem": false,
+    "gradientStart": "#2b2d42",
+    "gradientEnd": "#14151f",
+    "context": {
+      "headline": "Cross-Platform Game Frontend",
+      "description": "Unified console emulation frontend with shaders, netplay, rewind, and zero input latency.",
+      "playtime": "84 Hours Played",
+      "patchNotes": "RetroArch Multi-Core Engine",
+      "badge": "EMULATOR"
+    }
+  },
+  {
+    "id": "gallery",
+    "name": "Capture Gallery",
+    "icon": "qrc:/assets/covers/gallery.svg",
+    "exec": "nautilus Pictures",
+    "isSystem": false,
+    "gradientStart": "#11998e",
+    "gradientEnd": "#073b37",
+    "context": {
+      "headline": "Screenshots & Video Clips",
+      "description": "View and manage all your gameplay screenshots, trophy moments, and recorded gameplay clips.",
+      "playtime": "142 Captures",
+      "patchNotes": "Fast local media storage browser",
+      "badge": "MEDIA"
+    }
+  },
+  {
+    "id": "tv_video",
+    "name": "TV & Video",
+    "icon": "qrc:/assets/covers/tv_video.svg",
+    "exec": "mpv --player-operation-mode=pseudo-gui",
+    "isSystem": false,
+    "gradientStart": "#8e0e00",
+    "gradientEnd": "#1f0400",
+    "context": {
+      "headline": "Media Entertainment Hub",
+      "description": "Watch movies, stream channels, and playback local high definition video files with MPV player.",
+      "playtime": "Ready",
+      "patchNotes": "High Fidelity Audio & Video Passthrough",
+      "badge": "MEDIA"
+    }
+  },
+  {
+    "id": "terminal",
+    "name": "System Terminal",
+    "icon": "qrc:/assets/icons/terminal.svg",
+    "exec": "gnome-terminal || ptyxis || xterm",
+    "isSystem": false,
+    "gradientStart": "#232526",
+    "gradientEnd": "#0b0c0d",
+    "context": {
+      "headline": "Fedora Command Console",
+      "description": "Direct access to the underlying Fedora Linux 44 operating system, DNF package manager, and shell tools.",
+      "playtime": "System Tool",
+      "patchNotes": "Bash / Zsh Console Interface",
+      "badge": "SYSTEM"
+    }
+  },
+  {
+    "id": "library",
+    "name": "Library",
+    "icon": "qrc:/assets/covers/library.svg",
+    "exec": "",
+    "isSystem": true,
+    "gradientStart": "#1e3c72",
+    "gradientEnd": "#0c1a33",
+    "context": {
+      "headline": "All Installed Applications & Games",
+      "description": "Browse and launch all detected games, emulators, media apps, and system utilities installed on Fedora Linux.",
+      "playtime": "Full Catalog",
+      "patchNotes": "Automatic XDG and Steam Scanning",
+      "badge": "CATALOG"
+    }
+  }
+]
