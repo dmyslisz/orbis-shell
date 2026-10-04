@@ -16,7 +16,8 @@ Item {
         { id: "poweroff", name: "Turn Off System", desc: "Completely power off the system and close all running applications.", icon: "qrc:/assets/icons/power.svg" },
         { id: "reboot", name: "Restart System", desc: "Reboot the system and restart the Orbis OS desktop session.", icon: "qrc:/assets/icons/restart.svg" },
         { id: "switch_user", name: "Switch User", desc: "Log in with another user profile without logging out.", icon: "qrc:/assets/icons/profile.svg" },
-        { id: "logout", name: "Log Out", desc: "Log out the current user profile and return to welcome screen.", icon: "qrc:/assets/icons/power.svg" }
+        { id: "logout", name: "Log Out", desc: "Log out the current user profile and return to welcome screen.", icon: "qrc:/assets/icons/power.svg" },
+        { id: "close_shell", name: "Close Orbis Shell", desc: "Exit the Orbis OS Shell interface and return to desktop session.", icon: "qrc:/assets/icons/close_app.svg" }
     ]
 
     visible: isOpen
@@ -29,7 +30,7 @@ Item {
 
         Column {
             anchors.centerIn: parent
-            spacing: 32
+            spacing: 24
             width: 760
 
             Text {
@@ -42,7 +43,7 @@ Item {
 
             Column {
                 width: parent.width
-                spacing: 10
+                spacing: 8
 
                 Repeater {
                     model: root.powerOptions
@@ -51,25 +52,25 @@ Item {
                         required property int index
                         required property var modelData
                         width: parent.width
-                        height: 72
+                        height: 68
 
                         readonly property bool isSelected: root.selectedIndex === index
 
                         Rectangle {
                             anchors.fill: parent
                             radius: 6
-                            color: isSelected ? "#ffffff" : "#14243e"
+                            color: isSelected ? "#16325c" : "transparent"
                             border.color: isSelected ? "#ffffff" : "#20ffffff"
-                            border.width: isSelected ? 2 : 1
+                            border.width: isSelected ? 2.5 : 1
 
                             Row {
                                 anchors.fill: parent
-                                anchors.margins: 18
+                                anchors.margins: 16
                                 spacing: 20
 
                                 Image {
-                                    width: 32
-                                    height: 32
+                                    width: 30
+                                    height: 30
                                     source: modelData.icon
                                     fillMode: Image.PreserveAspectFit
                                     anchors.verticalCenter: parent.verticalCenter
@@ -77,18 +78,18 @@ Item {
 
                                 Column {
                                     anchors.verticalCenter: parent.verticalCenter
-                                    spacing: 4
+                                    spacing: 3
 
                                     Text {
                                         text: modelData.name
-                                        color: isSelected ? "#0a1d3d" : "#ffffff"
+                                        color: "#ffffff"
                                         font.pixelSize: 18
                                         font.weight: isSelected ? Font.DemiBold : Font.Normal
                                     }
 
                                     Text {
                                         text: modelData.desc
-                                        color: isSelected ? "#2a4d7d" : "#90a8c8"
+                                        color: isSelected ? "#c8ddfc" : "#90a8c8"
                                         font.pixelSize: 13
                                     }
                                 }
@@ -156,6 +157,8 @@ Item {
         } else if (opt.id === "logout") {
             soundController.playLogout();
             switchUserRequested();
+        } else if (opt.id === "close_shell") {
+            Qt.quit();
         }
     }
 }

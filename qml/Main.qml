@@ -216,6 +216,12 @@ Window {
                     soundController.playConfirm();
                 }
             }
+
+            onSwitchUserRequested: {
+                stage.activeSection = "users";
+                soundController.stopHomeScreenMusic();
+                soundController.playLoginTheme();
+            }
         }
 
         // ==========================================
@@ -243,6 +249,9 @@ Window {
                 stage.activeSection = "tiles";
                 soundController.playConfirm();
                 launchAppDirect(app);
+            }
+            onNotificationRequested: function(msg, icon) {
+                showNotification(msg, icon);
             }
         }
 
@@ -289,37 +298,75 @@ Window {
 
 
 
-        // Subtle toast banner for standard notifications
-        Rectangle {
+        // PS4-style notification banner (slides in on top-left)
+        Item {
             id: toastBanner
-            anchors.bottom: bottomBar.top
-            anchors.bottomMargin: 16
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: toastText.implicitWidth + 48
-            height: 44
-            radius: 4
-            color: "#e6002152"
-            border.color: "#ffffff"
-            border.width: 1.5
-            opacity: 0.0
-            z: 400
+            anchors.top: parent.top
+            anchors.topMargin: 48
+            property bool isShowing: false
+            x: isShowing ? 48 : -width - 40
+            width: Math.max(320, toastRow.implicitWidth + 36)
+            height: 56
+            opacity: isShowing ? 1.0 : 0.0
+            z: 500
 
+            Behavior on x {
+                NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
+            }
             Behavior on opacity {
-                NumberAnimation { duration: 160; easing.type: Easing.OutQuad }
+                NumberAnimation { duration: 200; easing.type: Easing.OutQuad }
             }
 
-            Text {
-                id: toastText
-                anchors.centerIn: parent
-                color: "#ffffff"
-                font.pixelSize: 16
-                font.weight: Font.Medium
+            Rectangle {
+                anchors.fill: parent
+                radius: 28
+                color: "#f008162c"
+                border.color: "#ffffff"
+                border.width: 1.5
+
+                Row {
+                    id: toastRow
+                    anchors.fill: parent
+                    anchors.leftMargin: 12
+                    anchors.rightMargin: 20
+                    spacing: 14
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    // Notification Icon Badge
+                    Rectangle {
+                        width: 34
+                        height: 34
+                        radius: 17
+                        color: "#18325a"
+                        anchors.verticalCenter: parent.verticalCenter
+                        clip: true
+
+                        Image {
+                            id: toastIcon
+                            anchors.centerIn: parent
+                            width: 22
+                            height: 22
+                            source: "qrc:/assets/icons/launcher_logo.svg"
+                            fillMode: Image.PreserveAspectFit
+                        }
+                    }
+
+                    Text {
+                        id: toastText
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: "#ffffff"
+                        font.pixelSize: 16
+                        font.weight: Font.Medium
+                        elide: Text.ElideRight
+                        maximumLineCount: 1
+                    }
+                }
             }
 
             Timer {
                 id: toastTimer
-                interval: 2600
-                onTriggered: toastBanner.opacity = 0.0
+                interval: 3400
+                onTriggered: toastBanner.isShowing = false
             }
         }
 
@@ -438,10 +485,15 @@ Window {
         }
     }
 
-    function showNotification(msg) {
+    function showNotification(msg, icon) {
         soundController.playNotification();
         toastText.text = msg;
-        toastBanner.opacity = 1.0;
+        if (icon && icon.length > 0) {
+            toastIcon.source = icon;
+        } else {
+            toastIcon.source = "qrc:/assets/icons/launcher_logo.svg";
+        }
+        toastBanner.isShowing = true;
         toastTimer.restart();
     }
 
@@ -643,8 +695,10 @@ Window {
             stage.activeSection = "topbar";
             soundController.playBack();
         } else if (stage.activeSection === "library") {
-            stage.activeSection = "tiles";
-            soundController.playBack();
+            if (!libraryView.handleBack()) {
+                stage.activeSection = "tiles";
+                soundController.playBack();
+            }
         }
     }
 
@@ -652,6 +706,10 @@ Window {
         if (virtualKeyboard.isOpen) return;
         if (stage.activeSection === "users") {
             userSelectScreen.openOptions();
+            return;
+        }
+        if (stage.activeSection === "library") {
+            libraryView.openOptions();
             return;
         }
         soundController.playOptions();

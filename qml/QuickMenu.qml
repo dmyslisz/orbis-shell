@@ -17,11 +17,21 @@ Item {
 
     signal actionTriggered(string actionId)
     signal closeRequested()
+    signal switchUserRequested()
 
     readonly property var menuItems: [
         { id: "close_app", name: "Close Application", icon: "qrc:/assets/icons/close_app.svg" },
         { id: "sound_devices", name: "Sound / Devices", icon: "qrc:/assets/icons/sound_devices.svg" },
         { id: "power", name: "Power", icon: "qrc:/assets/icons/power.svg" }
+    ]
+
+    readonly property var powerOptions: [
+        { id: "rest", name: "Enter Rest Mode", icon: "qrc:/assets/icons/rest_mode.svg" },
+        { id: "poweroff", name: "Turn Off System", icon: "qrc:/assets/icons/power.svg" },
+        { id: "reboot", name: "Restart System", icon: "qrc:/assets/icons/restart.svg" },
+        { id: "switch_user", name: "Switch User", icon: "qrc:/assets/icons/profile.svg" },
+        { id: "logout", name: "Log Out", icon: "qrc:/assets/icons/power.svg" },
+        { id: "close_shell", name: "Close Orbis Shell", icon: "qrc:/assets/icons/close_app.svg" }
     ]
 
     // Dim background
@@ -226,9 +236,10 @@ Item {
                     width: parent.width - 20
                     height: 56
                     radius: 4
-                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#142848"
-                    border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#30ffffff"
-                    border.width: 2
+                    readonly property bool isCloseSelected: root.activePane === 1 && root.rightSelectedIndex === 0
+                    color: isCloseSelected ? "#16325c" : "#142848"
+                    border.color: isCloseSelected ? "#ffffff" : "#30ffffff"
+                    border.width: isCloseSelected ? 2.5 : 1
 
                     Row {
                         anchors.fill: parent
@@ -244,9 +255,9 @@ Item {
 
                         Text {
                             text: "Close " + processLauncher.currentAppName
-                            color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#0a1d3d" : "#ffffff"
+                            color: "#ffffff"
                             font.pixelSize: 17
-                            font.weight: Font.Medium
+                            font.weight: isCloseSelected ? Font.DemiBold : Font.Normal
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
@@ -452,7 +463,7 @@ Item {
             // 3. Power Pane
             Column {
                 visible: root.selectedIndex === 2
-                spacing: 16
+                spacing: 8
                 width: parent.width
 
                 Text {
@@ -462,119 +473,53 @@ Item {
                     font.weight: Font.DemiBold
                 }
 
-                // Power option 0: Rest Mode
-                Rectangle {
-                    width: parent.width - 20
-                    height: 56
-                    radius: 4
-                    color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#16325c" : "#142848"
-                    border.color: (root.activePane === 1 && root.rightSelectedIndex === 0) ? "#ffffff" : "#30ffffff"
-                    border.width: (root.activePane === 1 && root.rightSelectedIndex === 0) ? 2.5 : 1
+                Repeater {
+                    model: root.powerOptions
 
-                    Row {
-                        anchors.fill: parent
-                        anchors.margins: 16
-                        spacing: 12
+                    Item {
+                        required property int index
+                        required property var modelData
+                        width: parent.width - 20
+                        height: 52
 
-                        Image {
-                            width: 22
-                            height: 22
-                            source: "qrc:/assets/icons/rest_mode.svg"
-                            anchors.verticalCenter: parent.verticalCenter
+                        readonly property bool isSelected: root.activePane === 1 && root.rightSelectedIndex === index
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: 4
+                            color: isSelected ? "#16325c" : "#142848"
+                            border.color: isSelected ? "#ffffff" : "#30ffffff"
+                            border.width: isSelected ? 2.5 : 1
+
+                            Row {
+                                anchors.fill: parent
+                                anchors.margins: 14
+                                spacing: 12
+
+                                Image {
+                                    width: 22
+                                    height: 22
+                                    source: modelData.icon
+                                    fillMode: Image.PreserveAspectFit
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                Text {
+                                    text: modelData.name
+                                    color: "#ffffff"
+                                    font.pixelSize: 16
+                                    font.weight: isSelected ? Font.DemiBold : Font.Normal
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
                         }
 
-                        Text {
-                            text: "Enter Rest Mode"
-                            color: "#ffffff"
-                            font.pixelSize: 17
-                            font.weight: Font.Medium
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            systemManager.enterRestMode();
-                            soundController.playConfirm();
-                        }
-                    }
-                }
-
-                // Power option 1: Turn Off
-                Rectangle {
-                    width: parent.width - 20
-                    height: 56
-                    radius: 4
-                    color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#16325c" : "#142848"
-                    border.color: (root.activePane === 1 && root.rightSelectedIndex === 1) ? "#ffffff" : "#30ffffff"
-                    border.width: (root.activePane === 1 && root.rightSelectedIndex === 1) ? 2.5 : 1
-
-                    Row {
-                        anchors.fill: parent
-                        anchors.margins: 16
-                        spacing: 12
-
-                        Image {
-                            width: 22
-                            height: 22
-                            source: "qrc:/assets/icons/power.svg"
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Text {
-                            text: "Turn Off System"
-                            color: "#ffffff"
-                            font.pixelSize: 17
-                            font.weight: Font.Medium
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            systemManager.turnOff();
-                            soundController.playConfirm();
-                        }
-                    }
-                }
-
-                // Power option 2: Restart
-                Rectangle {
-                    width: parent.width - 20
-                    height: 56
-                    radius: 4
-                    color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#16325c" : "#142848"
-                    border.color: (root.activePane === 1 && root.rightSelectedIndex === 2) ? "#ffffff" : "#30ffffff"
-                    border.width: (root.activePane === 1 && root.rightSelectedIndex === 2) ? 2.5 : 1
-
-                    Row {
-                        anchors.fill: parent
-                        anchors.margins: 16
-                        spacing: 12
-
-                        Image {
-                            width: 22
-                            height: 22
-                            source: "qrc:/assets/icons/restart.svg"
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Text {
-                            text: "Restart System"
-                            color: "#ffffff"
-                            font.pixelSize: 17
-                            font.weight: Font.Medium
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            systemManager.restart();
-                            soundController.playConfirm();
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                root.rightSelectedIndex = index;
+                                root.triggerRightAction();
+                            }
                         }
                     }
                 }
@@ -710,7 +655,7 @@ Item {
     function getMaxRightItems() {
         if (selectedIndex === 0) return processLauncher.isAppRunning ? 1 : 0;
         if (selectedIndex === 1) return 2; // 0 = Volume, 1 = Mute
-        if (selectedIndex === 2) return 3; // 0 = Rest, 1 = Off, 2 = Reboot
+        if (selectedIndex === 2) return powerOptions.length;
         return 0;
     }
 
@@ -726,12 +671,20 @@ Item {
                 systemManager.setIsMuted(!systemManager.isMuted);
             }
         } else if (selectedIndex === 2) {
-            if (rightSelectedIndex === 0) {
+            var pOpt = powerOptions[rightSelectedIndex];
+            if (pOpt.id === "rest") {
                 systemManager.enterRestMode();
-            } else if (rightSelectedIndex === 1) {
+            } else if (pOpt.id === "poweroff") {
                 systemManager.turnOff();
-            } else if (rightSelectedIndex === 2) {
+            } else if (pOpt.id === "reboot") {
                 systemManager.restart();
+            } else if (pOpt.id === "switch_user") {
+                root.switchUserRequested();
+            } else if (pOpt.id === "logout") {
+                soundController.playLogout();
+                root.switchUserRequested();
+            } else if (pOpt.id === "close_shell") {
+                Qt.quit();
             }
         }
     }

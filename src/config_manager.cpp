@@ -9,6 +9,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QDateTime>
+#include <QRegularExpression>
 #include <QDebug>
 
 ConfigManager::ConfigManager(const QString &configDir, QObject *parent)
@@ -302,3 +303,99 @@ void ConfigManager::unlockTrophy(const QString &trophyId)
         }
     }
 }
+
+bool ConfigManager::isAppOnHomeScreen(const QString &appId) const
+{
+    if (appId.isEmpty()) return false;
+    for (const QVariant &v : m_baseApps) {
+        QVariantMap m = v.toMap();
+        if (m.value("id").toString() == appId || m.value("name").toString() == appId) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void ConfigManager::addAppToHomeScreen(const QVariantMap &app)
+{
+    QString id = app.value("id").toString();
+    if (id.isEmpty()) {
+        id = app.value("name").toString().toLower();
+        id.replace(QRegularExpression("[^a-z0-9]"), "_");
+    }
+
+    // Check if already in m_baseApps
+    for (int i = 0; i < m_baseApps.size(); ++i) {
+        QVariantMap m = m_baseApps[i].toMap();
+        if (m.value("id").toString() == id || m.value("name").toString() == app.value("name").toString()) {
+            return; // Already present
+        }
+    }
+
+    QVariantMap newApp = app;
+    newApp["id"] = id;
+    if (!newApp.contains("isSystem")) {
+        newApp["isSystem"] = false;
+    }
+    if (!newApp.contains("gradientStart") || newApp["gradientStart"].toString().isEmpty()) {
+        newApp["gradientStart"] = "#0052D4";
+        newApp["gradientEnd"] = "#102a6b";
+    }
+    if (!newApp.contains("context")) {
+        QVariantMap ctx;
+        ctx["headline"] = newApp["name"].toString();
+        ctx["description"] = newApp.value("comment", "Application installed on Fedora Linux.").toString();
+        ctx["playtime"] = "Application";
+        ctx["patchNotes"] = "Installed Application";
+        ctx["badge"] = "APP";
+        newApp["context"] = ctx;
+    }
+
+    // Insert before "library" tile if library exists, otherwise at the end
+    int insertIdx = m_baseApps.size();
+    for (int i = 0; i < m_baseApps.size(); ++i) {
+        if (m_baseApps[i].toMap().value("id").toString() == "library") {
+            insertIdx = i;
+            break;
+        }
+    }
+    m_baseApps.insert(insertIdx, newApp);
+    mergeScannedItems();
+
+    // Persist to apps.json
+    QString path = m_configDir + "/apps.json";
+    QFile file(path);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QJsonArray arr;
+        for (const auto &a : m_baseApps) {
+            arr.append(QJsonObject::fromVariantMap(a.toMap()));
+        }
+        file.write(QJsonDocument(arr).toJson(QJsonDocument::Indented));
+        file.close();
+    }
+}
+
+void ConfigManager::removeAppFromHomeScreen(const QString &appId)
+{
+    if (appId.isEmpty() || appId == "library" || appId == "whats_new") return; // Protect core tiles
+    for (int i = 0; i < m_baseApps.size(); ++i) {
+        QVariantMap m = m_baseApps[i].toMap();
+        if (m.value("id").toString() == appId || m.value("name").toString() == appId) {
+            m_baseApps.removeAt(i);
+            break;
+        }
+    }
+    mergeScannedItems();
+
+    QString path = m_configDir + "/apps.json";
+    QFile file(path);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QJsonArray arr;
+        for (const auto &a : m_baseApps) {
+            arr.append(QJsonObject::fromVariantMap(a.toMap()));
+        }
+        file.write(QJsonDocument(arr).toJson(QJsonDocument::Indented));
+        file.close();
+    }
+}
+

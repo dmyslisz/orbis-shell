@@ -35,6 +35,9 @@ public:
     Q_INVOKABLE void deleteUser(const QString &userId);
     Q_INVOKABLE void unlockTrophy(const QString &trophyId);
     Q_INVOKABLE void refreshCatalog();
+    Q_INVOKABLE bool isAppOnHomeScreen(const QString &appId) const;
+    Q_INVOKABLE void addAppToHomeScreen(const QVariantMap &app);
+    Q_INVOKABLE void removeAppFromHomeScreen(const QString &appId);
 
 signals:
     void appsChanged();
