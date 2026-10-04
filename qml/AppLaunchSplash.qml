@@ -3,7 +3,7 @@ import QtQuick
 Item {
     id: root
     anchors.fill: parent
-    z: 250
+    z: 1000
     visible: opacity > 0.001
     opacity: 0.0
 
@@ -12,146 +12,103 @@ Item {
 
     signal launchCompleted()
 
+    // Smooth overall fade
     Behavior on opacity {
-        NumberAnimation { duration: 250; easing.type: Easing.OutQuad }
+        NumberAnimation { duration: 240; easing.type: Easing.OutQuad }
     }
 
-    // Deep sapphire background with radial vignette
+    // 1. Deep solid pitch black background (PS4 splash backdrop)
     Rectangle {
         anchors.fill: parent
-        color: "#030a18"
+        color: "#000000"
+    }
 
-        // Ambient radial glow behind the icon
+    // 2. Icon zoom & dissolve container
+    Item {
+        id: iconZoomContainer
+        anchors.centerIn: parent
+        width: 320
+        height: 320
+
+        scale: root.isLaunching ? 1.45 : 0.95
+        opacity: root.isLaunching ? 0.0 : 1.0
+
+        Behavior on scale {
+            NumberAnimation { duration: 520; easing.type: Easing.OutCubic }
+        }
+        Behavior on opacity {
+            NumberAnimation { duration: 420; easing.type: Easing.InQuad }
+        }
+
         Rectangle {
-            anchors.centerIn: parent
-            width: 700
-            height: 700
-            radius: 350
-            color: (root.appData && root.appData.gradientStart) ? root.appData.gradientStart : "#0f326c"
-            opacity: 0.28
+            anchors.fill: parent
+            radius: 6
+            color: "transparent"
+            clip: true
+
+            Image {
+                anchors.fill: parent
+                source: (root.appData && root.appData.icon) ? root.appData.icon : ""
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                mipmap: true
+            }
         }
     }
 
-    // Zoom-in / scale container for the icon and branding
+    // 3. Centered Title / Logo reveal & scale (Photo/Video at 13:31)
     Item {
-        id: centerContent
+        id: titleContainer
         anchors.centerIn: parent
-        width: 600
-        height: 480
-        scale: root.isLaunching ? 1.0 : 0.7
+        width: parent.width - 160
+        height: 240
+
+        scale: root.isLaunching ? 1.0 : 0.82
         opacity: root.isLaunching ? 1.0 : 0.0
 
         Behavior on scale {
-            NumberAnimation { duration: 420; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
         }
         Behavior on opacity {
-            NumberAnimation { duration: 320; easing.type: Easing.OutQuad }
+            NumberAnimation { duration: 380; easing.type: Easing.OutQuad }
         }
 
         Column {
             anchors.centerIn: parent
-            spacing: 32
+            spacing: 12
 
-            // Glowing Icon Box
-            Item {
-                width: 220
-                height: 220
+            Text {
+                text: root.appData ? root.appData.name : ""
+                color: "#ffffff"
+                font.pixelSize: 48
+                font.weight: Font.Bold
+                font.letterSpacing: 2
+                horizontalAlignment: Text.AlignHCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-
-                // Soft outer glow ring
-                Rectangle {
-                    anchors.centerIn: parent
-                    width: parent.width + 24
-                    height: parent.height + 24
-                    radius: 16
-                    color: "transparent"
-                    border.color: "#80d0ff"
-                    border.width: 3
-                    opacity: 0.6
-
-                    SequentialAnimation on opacity {
-                        loops: Animation.Infinite
-                        running: root.isLaunching
-                        NumberAnimation { to: 0.9; duration: 750; easing.type: Easing.InOutSine }
-                        NumberAnimation { to: 0.35; duration: 750; easing.type: Easing.InOutSine }
-                    }
-                }
-
-                // Main Icon card
-                Rectangle {
-                    anchors.fill: parent
-                    radius: 12
-                    color: "#0a1d3d"
-                    clip: true
-                    border.color: "#ffffff"
-                    border.width: 2
-
-                    Image {
-                        anchors.fill: parent
-                        source: (root.appData && root.appData.icon) ? root.appData.icon : ""
-                        fillMode: Image.PreserveAspectCrop
-                        mipmap: true
-                    }
-                }
+                elide: Text.ElideRight
+                maximumLineCount: 2
+                width: titleContainer.width
             }
 
-            // App Name & Status
-            Column {
-                spacing: 12
+            Text {
+                visible: root.appData && (root.appData.category || (root.appData.context && root.appData.context.badge))
+                text: (root.appData && root.appData.context && root.appData.context.badge) ? root.appData.context.badge : (root.appData ? root.appData.category : "")
+                color: "#90a4c4"
+                font.pixelSize: 16
+                font.weight: Font.Medium
+                font.letterSpacing: 3
+                horizontalAlignment: Text.AlignHCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-
-                Text {
-                    text: root.appData ? root.appData.name : ""
-                    color: "#ffffff"
-                    font.pixelSize: 32
-                    font.weight: Font.DemiBold
-                    horizontalAlignment: Text.AlignHCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-
-                Text {
-                    text: "Starting..."
-                    color: "#a0c8f8"
-                    font.pixelSize: 18
-                    font.weight: Font.Normal
-                    horizontalAlignment: Text.AlignHCenter
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-            }
-
-            // Authentic PS4 Loading Shimmer Bar
-            Rectangle {
-                width: 320
-                height: 4
-                radius: 2
-                color: "#204070"
-                anchors.horizontalCenter: parent.horizontalCenter
-                clip: true
-
-                Rectangle {
-                    id: shimmer
-                    width: 90
-                    height: parent.height
-                    radius: 2
-                    color: "#ffffff"
-
-                    PropertyAnimation on x {
-                        from: -100
-                        to: 330
-                        duration: 1100
-                        loops: Animation.Infinite
-                        running: root.isLaunching
-                    }
-                }
+                opacity: 0.8
             }
         }
     }
 
+    // Splash hold timer (holds splash on pitch black screen like PS4)
     Timer {
-        id: hideTimer
-        interval: 1800
+        id: holdTimer
+        interval: 2200
         onTriggered: {
-            root.isLaunching = false;
             root.opacity = 0.0;
             fadeTimer.restart();
         }
@@ -159,14 +116,26 @@ Item {
 
     Timer {
         id: fadeTimer
-        interval: 300
-        onTriggered: root.launchCompleted()
+        interval: 260
+        onTriggered: {
+            root.isLaunching = false;
+            root.launchCompleted();
+        }
     }
 
     function startLaunch(data) {
         root.appData = data;
+        root.isLaunching = false;
         root.opacity = 1.0;
-        root.isLaunching = true;
-        hideTimer.restart();
+        animStartTimer.restart();
+    }
+
+    Timer {
+        id: animStartTimer
+        interval: 20
+        onTriggered: {
+            root.isLaunching = true;
+            holdTimer.restart();
+        }
     }
 }

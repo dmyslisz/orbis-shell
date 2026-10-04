@@ -126,25 +126,14 @@ Item {
                 NumberAnimation { duration: 150 }
             }
 
-            // What's New: Down Arrow
-            Row {
+            // What's New: Down Arrow icon only
+            Image {
                 anchors.centerIn: parent
-                spacing: 8
+                width: 20
+                height: 20
+                source: "qrc:/assets/icons/down_arrow.svg"
+                fillMode: Image.PreserveAspectFit
                 visible: root.appData && root.appData.id === "whats_new"
-
-                Image {
-                    width: 18
-                    height: 18
-                    source: "qrc:/assets/icons/down_arrow.svg"
-                    anchors.verticalCenter: parent.verticalCenter
-                }
-
-                Text {
-                    text: "Overview"
-                    color: "#b0d0ff"
-                    font.pixelSize: 14
-                    anchors.verticalCenter: parent.verticalCenter
-                }
             }
 
             // All other tiles: "Start" written
